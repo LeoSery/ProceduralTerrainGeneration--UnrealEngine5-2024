@@ -1,4 +1,5 @@
 # User-specific stuff
+.idea/
 .idea/**/workspace.xml
 .idea/**/tasks.xml
 .idea/**/usage.statistics.xml
@@ -555,6 +556,3 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
-
-### VisualStudio Patch ###
-# Additional files built by Visual Studio
