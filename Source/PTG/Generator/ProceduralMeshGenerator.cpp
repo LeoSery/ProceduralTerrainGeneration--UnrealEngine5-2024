@@ -5,6 +5,7 @@ AProceduralMeshGenerator::AProceduralMeshGenerator()
 {
 	PrimaryActorTick.bCanEverTick = false;
 	ProceduralMesh = CreateDefaultSubobject<UProceduralMeshComponent>(TEXT("ProceduralMesh"));
+	RootComponent = ProceduralMesh;
 }
 
 void AProceduralMeshGenerator::CreateTriangleMesh(FVector Point1, FVector Point2, FVector Point3)
@@ -37,8 +38,16 @@ void AProceduralMeshGenerator::CreateTriangleMesh(FVector Point1, FVector Point2
 	if (ProceduralMesh)
 	{
 		ProceduralMesh->ClearAllMeshSections();
-		ProceduralMesh->CreateMeshSection_LinearColor(0, Vertices, Triangles, Normals, UVs, 
-			TArray<FLinearColor>(), TArray<FProcMeshTangent>(), true);
+		ProceduralMesh->CreateMeshSection_LinearColor(
+			0,
+			Vertices,
+			Triangles,
+			Normals,
+			UVs,
+			TArray<FLinearColor>(),
+			TArray<FProcMeshTangent>(),
+			true
+			);
 	}
 }
 

@@ -118,6 +118,8 @@ fabric.properties
 *.VC.db
 *.VC.opendb
 
+Content/__ExternalObjects__/*
+
 # Precompiled Assets
 SourceArt/**/*.png
 SourceArt/**/*.tga
