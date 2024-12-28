@@ -14,11 +14,13 @@ class PTG_API AGenerator : public AActor
 	
 public:
 	AGenerator();
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ProceduralMesh")
+	UMaterialInterface* Material;
 	
 	virtual void BeginPlay() override;
 	
 	void GenerateTerrain();
-
 	FChunk GenerateChunk(int _x, int _y, int _size, int _octaves, float _persistence, float _frequency);
 
 private:

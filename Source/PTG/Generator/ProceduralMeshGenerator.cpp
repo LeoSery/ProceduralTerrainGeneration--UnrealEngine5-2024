@@ -21,8 +21,8 @@ void AProceduralMeshGenerator::CreateTriangleMesh(FVector Point1, FVector Point2
 	Triangles.Add(2);
     
 	TArray<FVector> Normals;
-	FVector Edge1 = Point2 - Point1;
-	FVector Edge2 = Point3 - Point1;
+	FVector Edge1 = Point3 - Point1;
+	FVector Edge2 = Point2 - Point1;
 	FVector Normal = FVector::CrossProduct(Edge1, Edge2).GetSafeNormal();
     
 	for (int32 i = 0; i < Vertices.Num(); ++i)

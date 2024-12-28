@@ -23,7 +23,19 @@ void AGenerator::GenerateTerrain()
 {
 	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Generating terrain..."));
 
-	m_meshGenerator->CreateTriangleMesh(FVector(0, 0, 0), FVector(0, 100, 0), FVector(100, 0, 0));	
+	if (m_meshGenerator)
+	{
+		m_meshGenerator->CreateTriangleMesh(
+			FVector(0, 0, 100),
+			FVector(0, 100, 100),
+			FVector(100, 0, 100)
+		);
+
+		if (Material)
+		{
+			m_meshGenerator->ProceduralMesh->SetMaterial(0, Material);
+		}
+	}	
 }
 
 FChunk AGenerator::GenerateChunk(int _x, int _y, int _size, int _octaves, float _persistence, float _frequency)

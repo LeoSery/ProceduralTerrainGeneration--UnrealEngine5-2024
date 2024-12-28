@@ -26,7 +26,7 @@ public:
 	FVector GenerateVector(int _x, int _y, int _octave);
 
 	UFUNCTION(BlueprintCallable)
-	static float GenerateOctavePerlinValue(float _x, float _y, int32 _octaves, float _persistence, float _frequency);
+	float GenerateOctavePerlinValue(float _x, float _y, int32 _octaves, float _persistence, float _frequency);
 	UFUNCTION(BlueprintCallable)
 	UTexture2D* GeneratePerlinNoise2D(FVector2D TextureSize, FString AssetPath);
 
