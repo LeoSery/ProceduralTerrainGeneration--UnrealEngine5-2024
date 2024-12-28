@@ -31,10 +31,12 @@ FChunk AGenerator::GenerateChunk(int _x, int _y, int _size, int _octaves, float 
 	FChunk chunk;
 	chunk.size = _size;
 	chunk.Coords = FVector(_x, _y,0);
+	APerlinNoise perlinPinPin;
+	perlinPinPin.SetSeed(42);
 	for (int y = _y; y < _y + _size; y++) {
 		for (int x = _x; x < _x + _size; x++) {
 			FVertices vertex;
-			vertex.Coords = FVector(x, y, APerlinNoise::GenerateOctavePerlinValue(_x,_y,_octaves,_persistence,_frequency));
+			vertex.Coords = FVector(x, y, perlinPinPin.GenerateOctavePerlinValue(_x,_y,_octaves,_persistence,_frequency));
 			/* Put Normal Vector Calc here*/
 			chunk.vertexArray.Add(vertex);
 		}
