@@ -25,10 +25,17 @@ void AGenerator::GenerateTerrain()
 
 	if (m_meshGenerator)
 	{
-		m_meshGenerator->CreateTriangleMesh(
-			FVector(0, 0, 100),
-			FVector(0, 100, 100),
-			FVector(100, 0, 100)
+		// m_meshGenerator->CreateTriangleMesh(
+		// 	FVector(0, 0, 100),
+		// 	FVector(0, 100, 100),
+		// 	FVector(100, 0, 100)
+		// );
+
+		m_meshGenerator->CreateSquareMesh(
+			FVector(0, 0, 0),    // Point1 (bas-gauche)
+			FVector(100, 0, 0),  // Point2 (bas-droite)
+			FVector(0, 100, 0),  // Point3 (haut-gauche)
+			FVector(100, 100, 0) // Point4 (haut-droite)
 		);
 
 		if (Material)

@@ -19,6 +19,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "ProceduralMesh")
 	void CreateTriangleMesh(FVector Point1, FVector Point2, FVector Point3);
 
+	UFUNCTION(BlueprintCallable, Category = "ProceduralMesh")
+	void CreateSquareMesh(FVector Point1, FVector Point2, FVector Point3, FVector Point4);
+
 protected:
 	virtual void BeginPlay() override;
 };
