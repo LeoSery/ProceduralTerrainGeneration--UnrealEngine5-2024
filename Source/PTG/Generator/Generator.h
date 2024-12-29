@@ -21,6 +21,7 @@ public:
 	virtual void BeginPlay() override;
 	
 	void GenerateTerrain();
+	void DisplayChunk(const FChunk& Chunk) const;
 	FChunk GenerateChunk(int _x, int _y, int _size, int _octaves, float _persistence, float _frequency);
 
 private:

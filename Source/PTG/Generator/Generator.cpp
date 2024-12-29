@@ -2,9 +2,8 @@
 #include "Generator.h"
 #include <PTG/Generator/PerlinNoise.h>
 
-AGenerator::AGenerator()
+AGenerator::AGenerator(): Material(nullptr), m_width(0), m_height(0), m_meshGenerator(nullptr)
 {
-	
 }
 
 void AGenerator::BeginPlay()
@@ -25,19 +24,21 @@ void AGenerator::GenerateTerrain()
 
 	if (m_meshGenerator)
 	{
-		// m_meshGenerator->CreateTriangleMesh(
-		// 	FVector(0, 0, 100),
-		// 	FVector(0, 100, 100),
-		// 	FVector(100, 0, 100)
-		// );
-
+		m_meshGenerator->ProceduralMesh->ClearAllMeshSections(); // Clear all mesh sections before generating new ones
+		
+		// DEBUG TEST
 		m_meshGenerator->CreateSquareMesh(
 			FVector(0, 0, 0),    // Point1 (bas-gauche)
 			FVector(100, 0, 0),  // Point2 (bas-droite)
 			FVector(0, 100, 0),  // Point3 (haut-gauche)
-			FVector(100, 100, 0) // Point4 (haut-droite)
+			FVector(100, 100, 0), // Point4 (haut-droite)
+			464664 // random section index for testing with no conflicts with real index in noise generation
 		);
 
+		// DISPLAY A CHUNK
+		//DisplayChunk(GenerateChunk(0, 0, 100, 4, 0.5, 0.1));
+
+		// APPLY MATERIAL TO CHUNK MESHES
 		if (Material)
 		{
 			m_meshGenerator->ProceduralMesh->SetMaterial(0, Material);
@@ -45,20 +46,43 @@ void AGenerator::GenerateTerrain()
 	}	
 }
 
+void AGenerator::DisplayChunk(const FChunk& Chunk) const
+{
+	if (m_meshGenerator)
+	{
+		int32 sectionIndex = 0;
+		for (int32 x = 0; x < Chunk.size - 1; x++)
+		{
+			for (int32 y = 0;  y < Chunk.size - 1; y++)
+			{
+				const AProceduralMeshGenerator::FSquareIndices Indices = m_meshGenerator->GetSquareIndices(x, y, Chunk.size);
+            
+				m_meshGenerator->CreateSquareMesh(
+					Chunk.vertexArray[Indices.bottomLeft].Coords,
+					Chunk.vertexArray[Indices.bottomRight].Coords,
+					Chunk.vertexArray[Indices.topLeft].Coords,
+					Chunk.vertexArray[Indices.topRight].Coords,
+					sectionIndex++
+				);
+			}
+		}
+	}
+}
+
 FChunk AGenerator::GenerateChunk(int _x, int _y, int _size, int _octaves, float _persistence, float _frequency)
 {
-	FChunk chunk;
-	chunk.size = _size;
-	chunk.Coords = FVector(_x, _y,0);
+	FChunk Chunk;
+	Chunk.size = _size;
+	Chunk.Coords = FVector(_x, _y,0);
 	APerlinNoise perlinPinPin;
 	perlinPinPin.SetSeed(42);
 	for (int y = _y; y < _y + _size; y++) {
 		for (int x = _x; x < _x + _size; x++) {
 			FVertices vertex;
-			vertex.Coords = FVector(x, y, perlinPinPin.GenerateOctavePerlinValue(_x,_y,_octaves,_persistence,_frequency));
+			vertex.Coords = FVector(x, y, perlinPinPin.GenerateOctavePerlinValue(x,y,_octaves,_persistence,_frequency));
 			/* Put Normal Vector Calc here*/
-			chunk.vertexArray.Add(vertex);
+			Chunk.vertexArray.Add(vertex);
 		}
 	}
-	return FChunk();
+	return Chunk;
 }

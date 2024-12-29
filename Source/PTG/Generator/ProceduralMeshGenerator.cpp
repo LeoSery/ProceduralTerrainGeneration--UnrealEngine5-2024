@@ -8,7 +8,7 @@ AProceduralMeshGenerator::AProceduralMeshGenerator()
 	RootComponent = ProceduralMesh;
 }
 
-void AProceduralMeshGenerator::CreateTriangleMesh(FVector Point1, FVector Point2, FVector Point3)
+void AProceduralMeshGenerator::CreateTriangleMesh(FVector Point1, FVector Point2, FVector Point3, int32 sectionIndex)
 {
 	TArray<FVector> Vertices;
 	Vertices.Add(Point1);
@@ -37,9 +37,8 @@ void AProceduralMeshGenerator::CreateTriangleMesh(FVector Point1, FVector Point2
     
 	if (ProceduralMesh)
 	{
-		ProceduralMesh->ClearAllMeshSections();
 		ProceduralMesh->CreateMeshSection_LinearColor(
-			0,
+			sectionIndex,
 			Vertices,
 			Triangles,
 			Normals,
@@ -51,7 +50,7 @@ void AProceduralMeshGenerator::CreateTriangleMesh(FVector Point1, FVector Point2
 	}
 }
 
-void AProceduralMeshGenerator::CreateSquareMesh(FVector Point1, FVector Point2, FVector Point3, FVector Point4)
+void AProceduralMeshGenerator::CreateSquareMesh(FVector Point1, FVector Point2, FVector Point3, FVector Point4, int32 sectionIndex)
 {
 	TArray<FVector> Vertices;
 	Vertices.Add(Point1);  // Coin bas-gauche
@@ -87,9 +86,8 @@ void AProceduralMeshGenerator::CreateSquareMesh(FVector Point1, FVector Point2, 
 	
 	if (ProceduralMesh)
 	{
-		ProceduralMesh->ClearAllMeshSections();
 		ProceduralMesh->CreateMeshSection_LinearColor(
-			0,
+			sectionIndex,
 			Vertices,
 			Triangles,
 			Normals,
