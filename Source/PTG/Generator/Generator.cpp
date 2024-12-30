@@ -27,16 +27,16 @@ void AGenerator::GenerateTerrain()
 		m_meshGenerator->ProceduralMesh->ClearAllMeshSections(); // Clear all mesh sections before generating new ones
 		
 		// DEBUG TEST
-		m_meshGenerator->CreateSquareMesh(
+		/*m_meshGenerator->CreateSquareMesh(
 			FVector(0, 0, 0),    // Point1 (bas-gauche)
 			FVector(100, 0, 0),  // Point2 (bas-droite)
 			FVector(0, 100, 0),  // Point3 (haut-gauche)
 			FVector(100, 100, 0), // Point4 (haut-droite)
 			464664 // random section index for testing with no conflicts with real index in noise generation
-		);
+		);*/
 
 		// DISPLAY A CHUNK
-		//DisplayChunk(GenerateChunk(0, 0, 100, 4, 0.5, 0.1));
+		DisplayChunk(GenerateChunk(0, 0, 32, 4, 0.5, 0.1, 4));
 
 		// APPLY MATERIAL TO CHUNK MESHES
 		if (Material)
@@ -69,17 +69,16 @@ void AGenerator::DisplayChunk(const FChunk& Chunk) const
 	}
 }
 
-FChunk AGenerator::GenerateChunk(int _x, int _y, int _size, int _octaves, float _persistence, float _frequency)
+FChunk AGenerator::GenerateChunk(int _x, int _y, int _size, int _octaves, float _persistence, float _frequency,int _seed)
 {
 	FChunk Chunk;
 	Chunk.size = _size;
 	Chunk.Coords = FVector(_x, _y,0);
-	APerlinNoise perlinPinPin;
-	perlinPinPin.SetSeed(42);
+
 	for (int y = _y; y < _y + _size; y++) {
 		for (int x = _x; x < _x + _size; x++) {
 			FVertices vertex;
-			vertex.Coords = FVector(x, y, perlinPinPin.GenerateOctavePerlinValue(x,y,_octaves,_persistence,_frequency));
+			vertex.Coords = FVector(x*100, y*100, (UPerlinNoise::GenerateOctavePerlinValue(x,y,_octaves,_persistence,_frequency,_seed))*100);
 			/* Put Normal Vector Calc here*/
 			Chunk.vertexArray.Add(vertex);
 		}

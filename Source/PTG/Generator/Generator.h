@@ -22,7 +22,7 @@ public:
 	
 	void GenerateTerrain();
 	void DisplayChunk(const FChunk& Chunk) const;
-	FChunk GenerateChunk(int _x, int _y, int _size, int _octaves, float _persistence, float _frequency);
+	FChunk GenerateChunk(int _x, int _y, int _size, int _octaves, float _persistence, float _frequency,int _seed);
 
 private:
 	int m_width;

@@ -21,26 +21,26 @@
 #define M_PI 3.141592
 #define MIN_SIZE 257
 
-APerlinNoise::APerlinNoise()
+UPerlinNoise::UPerlinNoise()
 {
-
+    
 }
 
-void APerlinNoise::SetSeed(int32 _Seed)
+void UPerlinNoise::SetSeed(int32 _Seed)
 {
 	seed = _Seed;
 }
 
 
 
-float APerlinNoise::DotValue(FVector gradient_vector, int x1, int y1, float x, float y)
+float UPerlinNoise::DotValue(FVector gradient_vector, int x1, int y1, float x, float y)
 {
     x = x - x1;
     y = y - y1;
     return (x * gradient_vector.X + y * gradient_vector.Y);
 }
 
-float APerlinNoise::GenerateOctavePerlinValue(float _x, float _y, int32 _octaves, float _persistence, float _frequency)
+float UPerlinNoise::GenerateOctavePerlinValue(float _x, float _y, int32 _octaves, float _persistence, float _frequency,int _seed)
 {
     float total = 0.0;
     float amplitude = 1.0;
@@ -49,7 +49,7 @@ float APerlinNoise::GenerateOctavePerlinValue(float _x, float _y, int32 _octaves
     for (int i = 0; i < _octaves; i++)
     {
         
-        total += GeneratePerlinValue(_x, _y, i, _frequency) * amplitude;
+        total += GeneratePerlinValue(_x, _y, i, _frequency,_seed) * amplitude;
         _frequency = _frequency * 2.0;
         maxValue += amplitude;
         amplitude *= _persistence;
@@ -61,7 +61,7 @@ float APerlinNoise::GenerateOctavePerlinValue(float _x, float _y, int32 _octaves
 
 
 
-float APerlinNoise::GeneratePerlinValue(float _x, float _y, int _octave, float _frequency)
+float UPerlinNoise::GeneratePerlinValue(float _x, float _y, int _octave, float _frequency, int _seed)
 {
     
     // Scale input coordinates with frequency
@@ -80,10 +80,10 @@ float APerlinNoise::GeneratePerlinValue(float _x, float _y, int _octave, float _
 
 
     // Calculate dot products
-    float a1 = DotValue(GenerateVector(x0, y0, _octave), x0, y0, _x, _y);
-    float a2 = DotValue(GenerateVector(x1, y0, _octave), x1, y0, _x, _y);
-    float a3 = DotValue(GenerateVector(x0, y1, _octave), x0, y1, _x, _y);
-    float a4 = DotValue(GenerateVector(x1, y1, _octave), x1, y1, _x, _y);
+    float a1 = DotValue(GenerateVector(x0, y0, _octave,_seed), x0, y0, _x, _y);
+    float a2 = DotValue(GenerateVector(x1, y0, _octave,_seed), x1, y0, _x, _y);
+    float a3 = DotValue(GenerateVector(x0, y1, _octave,_seed), x0, y1, _x, _y);
+    float a4 = DotValue(GenerateVector(x1, y1, _octave,_seed), x1, y1, _x, _y);
     
     // Interpolate
     float b1 = FMath::Lerp(a1, a2, ((sx*6 - 15)*sx+10)*sx*sx*sx);
@@ -93,9 +93,9 @@ float APerlinNoise::GeneratePerlinValue(float _x, float _y, int _octave, float _
     return value;
 }
 
-FVector APerlinNoise::GenerateVector(int _x, int _y, int _octave)
+FVector UPerlinNoise::GenerateVector(int _x, int _y, int _octave, int _seed)
 {
-    std::mt19937 generator(((seed * 1518 + _x) * 1794 + _y)*1816 + _octave);
+    std::mt19937 generator(((_seed * 1518 + _x) * 1794 + _y)*1816 + _octave);
     std::uniform_real_distribution<double> uniform(0.0, 1.0);
     double theta = 2 * M_PI * uniform(generator);
     double phi = acos(2 * uniform(generator) - 1);
@@ -106,7 +106,7 @@ FVector APerlinNoise::GenerateVector(int _x, int _y, int _octave)
 }
 
 
-UTexture2D* APerlinNoise::GeneratePerlinNoise2D(FVector2D TextureSize, FString AssetPath)
+UTexture2D* UPerlinNoise::GeneratePerlinNoise2D(FVector2D TextureSize, FString AssetPath)
 {
     FString PackagePath = TEXT("/Game/") + AssetPath;
     UPackage* Package = CreatePackage(*PackagePath);
@@ -137,7 +137,7 @@ UTexture2D* APerlinNoise::GeneratePerlinNoise2D(FVector2D TextureSize, FString A
         for (int32 x = 0; x < SizeX; x++)
         {
             // Generate noise value for this pixel
-            float NoiseValue = GenerateOctavePerlinValue(x, y,octave,persistance,frequency);
+            float NoiseValue = GenerateOctavePerlinValue(x, y,octave,persistance,frequency,0);
 
             // Convert from [-1,1] to [0,255] range
             uint8 ColorIntensity = FMath::Clamp(((NoiseValue + 1.0f) / 2)*255,0,255);

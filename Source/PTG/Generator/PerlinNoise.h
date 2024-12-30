@@ -7,26 +7,26 @@
 
 
 UCLASS()
-class PTG_API APerlinNoise : public AActor
+class PTG_API UPerlinNoise : public UBlueprintFunctionLibrary
 {
 	GENERATED_BODY()
 
 public:
 
 
-	APerlinNoise();
+	UPerlinNoise();
 	
 	UFUNCTION(BlueprintCallable)
 	void SetSeed(int32 _Seed);
 
-	float DotValue(FVector gradient_vector, int x1, int y1, float x, float y);
+	static float DotValue(FVector gradient_vector, int x1, int y1, float x, float y);
 
-	float GeneratePerlinValue(float _x, float _y, int _octave, float _frequency);
+	static float GeneratePerlinValue(float _x, float _y, int _octave, float _frequency, int _seed);
 
-	FVector GenerateVector(int _x, int _y, int _octave);
+	static FVector GenerateVector(int _x, int _y, int _octave,int _seed);
 
 	UFUNCTION(BlueprintCallable)
-	float GenerateOctavePerlinValue(float _x, float _y, int32 _octaves, float _persistence, float _frequency);
+	static float GenerateOctavePerlinValue(float _x, float _y, int32 _octaves, float _persistence, float _frequency,int _seed);
 	UFUNCTION(BlueprintCallable)
 	UTexture2D* GeneratePerlinNoise2D(FVector2D TextureSize, FString AssetPath);
 
