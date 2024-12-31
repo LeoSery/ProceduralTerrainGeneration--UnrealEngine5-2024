@@ -27,7 +27,12 @@ void AChunkManager::GenerateChunk()
 {
 	if (TerrainGenerator && ProceduralMesh)
 	{
-		FChunk NewChunk = TerrainGenerator->GenerateChunk(0, 0, 32, 4, 0.5, 0.1, 4);
-		TerrainGenerator->DisplayChunk(NewChunk, ProceduralMesh);
+		FPerlinParameters parameters;
+		parameters.frequency = 0.1;
+		parameters.octaves = 4;
+		parameters.persistence = 0.5;
+		parameters.seed = 4;
+		TerrainGenerator->SetProceduralMesh(ProceduralMesh);
+		TerrainGenerator->GenerateChunk(0, 0, 32,parameters);
 	}
 }

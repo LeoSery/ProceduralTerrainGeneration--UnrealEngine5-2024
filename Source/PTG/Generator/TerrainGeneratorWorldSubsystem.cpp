@@ -2,6 +2,7 @@
 #include "Chunk_Type.h"
 #include "ProceduralMeshGeneratorSubsystem.h"
 #include "PerlinNoise.h"
+#include <PTG/Generator/ChunkThread.h>
 
 void UTerrainGeneratorWorldSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
@@ -13,7 +14,7 @@ void UTerrainGeneratorWorldSubsystem::Deinitialize()
 	Super::Deinitialize();
 }
 
-void UTerrainGeneratorWorldSubsystem::DisplayChunk(const FChunk& Chunk, UProceduralMeshComponent* ProceduralMesh) const
+void UTerrainGeneratorWorldSubsystem::DisplayChunk(const FChunk& Chunk, UProceduralMeshComponent* _ProceduralMesh) const
 {
 	if (UProceduralMeshGeneratorSubsystem* MeshGenerator = GetWorld()->GetGameInstance()->GetSubsystem<UProceduralMeshGeneratorSubsystem>())
 	{
@@ -36,19 +37,23 @@ void UTerrainGeneratorWorldSubsystem::DisplayChunk(const FChunk& Chunk, UProcedu
 	}
 }
 
-FChunk UTerrainGeneratorWorldSubsystem::GenerateChunk(int _x, int _y, int _size, int _octaves, float _persistence, float _frequency, int _seed)
+void UTerrainGeneratorWorldSubsystem::GenerateChunk(int _x, int _y, int _size, FPerlinParameters _parameters)
 {
 	FChunk Chunk;
 	Chunk.size = _size;
 	Chunk.Coords = FVector(_x, _y, 0);
+	Chunk.Id = FString::FromInt(_x) + FString::FromInt(_y);
+	ChunkMap.Add({ FString::FromInt(_x) + FString::FromInt(_y),Chunk });
+	FChunkThread* Thread = new FChunkThread(Chunk);
+	
+}
 
-	for (int y = _y; y < _y + _size; y++) {
-		for (int x = _x; x < _x + _size; x++) {
-			FVertices vertex;
-			vertex.Coords = FVector(x * 100, y * 100, (UPerlinNoise::GenerateOctavePerlinValue(x, y, _octaves, _persistence, _frequency, _seed)) * 100);
-			/* Put Normal Vector Calc here*/
-			Chunk.vertexArray.Add(vertex);
-		}
+void UTerrainGeneratorWorldSubsystem::OnChunkCalcOver(FString _id, FChunk _chunk)
+{
+	FChunk* chunk = ChunkMap.Find(_id);
+	if (chunk) {
+		chunk = &_chunk;
+
+		DisplayChunk(*chunk, ProceduralMesh);
 	}
-	return Chunk;
 }

@@ -30,4 +30,27 @@ struct FChunk
 
     UPROPERTY()
     FVector Coords;
+
+    UPROPERTY()
+    FString Id;
+};
+
+USTRUCT(BlueprintType)
+struct FPerlinParameters {
+
+    GENERATED_BODY()
+
+public :
+
+    UPROPERTY()
+    int octaves;
+
+    UPROPERTY()
+    float frequency;
+
+    UPROPERTY()
+    float persistence;
+
+    UPROPERTY()
+    int seed;
 };

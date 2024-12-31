@@ -6,6 +6,7 @@
 
 class UProceduralMeshComponent;
 struct FChunk;
+struct FPerlinParameters;
 
 UCLASS()
 class PTG_API UTerrainGeneratorWorldSubsystem : public UWorldSubsystem
@@ -17,5 +18,12 @@ public:
 	virtual void Deinitialize() override;
 
 	void DisplayChunk(const FChunk& Chunk, UProceduralMeshComponent* ProceduralMesh) const;
-	FChunk GenerateChunk(int _x, int _y, int _size, int _octaves, float _persistence, float _frequency, int _seed);
+	void GenerateChunk(int _x, int _y, int _size, FPerlinParameters _parameters);
+
+	void OnChunkCalcOver(FString _id, FChunk _chunk);
+
+	void SetProceduralMesh(UProceduralMeshComponent* _proceduralMesh) { ProceduralMesh = _proceduralMesh; };
+
+	TMap<FString, FChunk> ChunkMap;
+	UProceduralMeshComponent* ProceduralMesh;
 };
