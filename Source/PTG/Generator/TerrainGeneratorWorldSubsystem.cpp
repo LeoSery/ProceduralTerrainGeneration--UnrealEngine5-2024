@@ -1,8 +1,6 @@
 ﻿#include "TerrainGeneratorWorldSubsystem.h"
-#include "Chunk_Type.h"
+#include "ChunkData.h"
 #include "ProceduralMeshGeneratorSubsystem.h"
-#include "PerlinNoise.h"
-#include <PTG/Generator/ChunkThread.h>
 
 void UTerrainGeneratorWorldSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
@@ -14,46 +12,59 @@ void UTerrainGeneratorWorldSubsystem::Deinitialize()
 	Super::Deinitialize();
 }
 
-void UTerrainGeneratorWorldSubsystem::DisplayChunk(const FChunk& Chunk, UProceduralMeshComponent* _ProceduralMesh) const
+void UTerrainGeneratorWorldSubsystem::GenerateChunk(int32 X, int32 Y, int32 Size, const FPerlinParameters& Parameters)
 {
-	if (UProceduralMeshGeneratorSubsystem* MeshGenerator = GetWorld()->GetGameInstance()->GetSubsystem<UProceduralMeshGeneratorSubsystem>())
+	FChunk NewChunk;
+	NewChunk.Size = Size;
+	NewChunk.Coords = FVector(X, Y, 0);
+	NewChunk.Id = ChunkData::MakeChunkId(X, Y);
+
+	ChunkMap.Add(NewChunk.Id, NewChunk);
+	OnChunkGenerationComplete.Broadcast(NewChunk.Id);
+}
+
+void UTerrainGeneratorWorldSubsystem::DisplayChunk(int64 ChunkId)
+{
+	if (const FChunk* ChunkToDisplay = ChunkMap.Find(ChunkId))
 	{
-		for (int32 x = 0; x < Chunk.size - 1; x++)
-		{
-			for (int32 y = 0; y < Chunk.size - 1; y++)
-			{
-				const auto Indices = MeshGenerator->GetSquareIndices(x, y, Chunk.size);
-                
-				MeshGenerator->CreateSquareMesh(
-					ProceduralMesh,
-					Chunk.vertexArray[Indices.bottomLeft].Coords,
-					Chunk.vertexArray[Indices.bottomRight].Coords,
-					Chunk.vertexArray[Indices.topLeft].Coords,
-					Chunk.vertexArray[Indices.topRight].Coords,
-					x + y * (Chunk.size - 1)
-				);
-			}
-		}
+		DisplayChunkInternal(*ChunkToDisplay);
 	}
 }
 
-void UTerrainGeneratorWorldSubsystem::GenerateChunk(int _x, int _y, int _size, FPerlinParameters _parameters)
+bool UTerrainGeneratorWorldSubsystem::DestroyChunk(int64 ChunkId)
 {
-	FChunk Chunk;
-	Chunk.size = _size;
-	Chunk.Coords = FVector(_x, _y, 0);
-	Chunk.Id = FString::FromInt(_x) + FString::FromInt(_y);
-	ChunkMap.Add({ FString::FromInt(_x) + FString::FromInt(_y),Chunk });
-	FChunkThread* Thread = new FChunkThread(Chunk);
-	
+	if (ProceduralMesh && ChunkMap.Find(ChunkId))
+	{
+		// TODO: Add logic to clean chunk procedural mesh sections
+		return ChunkMap.Remove(ChunkId) > 0;
+	}
+	return false;
 }
 
-void UTerrainGeneratorWorldSubsystem::OnChunkCalcOver(FString _id, FChunk _chunk)
+void UTerrainGeneratorWorldSubsystem::DisplayChunkInternal(const FChunk& Chunk)
 {
-	FChunk* chunk = ChunkMap.Find(_id);
-	if (chunk) {
-		chunk = &_chunk;
+	if (!ProceduralMesh)
+	{
+		return;
+	}
 
-		DisplayChunk(*chunk, ProceduralMesh);
+	if (UProceduralMeshGeneratorSubsystem* MeshGenerator = GetWorld()->GetGameInstance()->GetSubsystem<UProceduralMeshGeneratorSubsystem>())
+	{
+		for (int32 x = 0; x < Chunk.Size - 1; x++)
+		{
+			for (int32 y = 0; y < Chunk.Size - 1; y++)
+			{
+				const auto Indices = MeshGenerator->GetSquareIndices(x, y, Chunk.Size);
+                
+				MeshGenerator->CreateSquareMesh(
+					ProceduralMesh,
+					Chunk.VertexArray[Indices.bottomLeft].Coords,
+					Chunk.VertexArray[Indices.bottomRight].Coords,
+					Chunk.VertexArray[Indices.topLeft].Coords,
+					Chunk.VertexArray[Indices.topRight].Coords,
+					x + y * (Chunk.Size - 1)
+				);
+			}
+		}
 	}
 }

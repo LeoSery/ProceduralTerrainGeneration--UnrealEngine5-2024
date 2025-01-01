@@ -15,18 +15,23 @@ class PTG_API AChunkManager : public AActor
 public:
 	AChunkManager();
 
-	UPROPERTY(VisibleAnywhere)
-	UProceduralMeshComponent* ProceduralMesh;
-
 protected:
 	virtual void BeginPlay() override;
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override; // like a destructor for unsubscribing to delegates
 	
 private:
+	UPROPERTY(VisibleAnywhere)
+	UProceduralMeshComponent* ProceduralMesh;
+	
 	UPROPERTY()
 	UTerrainGeneratorWorldSubsystem* TerrainGenerator;
 
 	UPROPERTY()
 	UProceduralMeshGeneratorSubsystem* MeshGenerator;
 
-	void GenerateChunk();
+	UFUNCTION()
+	void OnChunkGenerated(int64 ChunkId);
+
+	void RequestChunkGeneration(int32 X, int32 Y, int32 Size);
+	void RequestChunkDestruction(int64 ChunkId);
 };

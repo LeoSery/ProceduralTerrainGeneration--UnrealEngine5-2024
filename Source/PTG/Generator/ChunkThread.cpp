@@ -9,25 +9,24 @@ bool FChunkThread::Init() {
 
 uint32 FChunkThread::Run() {
 
-	int _size = chunk.size;
-	int _x = chunk.Coords.X;
-	int _y = chunk.Coords.Y;
+	int _size = Chunk.Size;
+	int _x = Chunk.Coords.X;
+	int _y = Chunk.Coords.Y;
 
 	for (int y = _y; y < _y + _size; y++) {
 		for (int x = _x; x < _x + _size; x++) {
 			FVertices vertex;
-			vertex.Coords = FVector(x * 100, y * 100, (UPerlinNoise::GenerateOctavePerlinValue(x, y, parameters.octaves, parameters.persistence, parameters.frequency, parameters.seed)) * 100);
+			vertex.Coords = FVector(x * 100, y * 100, (UPerlinNoise::GenerateOctavePerlinValue(x, y, Parameters.Octaves, Parameters.Persistence, Parameters.Frequency, Parameters.Seed)) * 100);
 			/* Put Normal Vector Calc here*/
-			chunk.vertexArray.Add(vertex);
+			Chunk.VertexArray.Add(vertex);
 		}
 	}
 	return 1;
 }
 
 void FChunkThread::Exit() {
-	isOver = true;
-
-	OnCalcOver.Execute(FString::SanitizeFloat(chunk.Coords.X) + FString::SanitizeFloat(chunk.Coords.Y));
+	bisOver = true;
+	OnCalcOver.Execute(Chunk.Id);
 }
 
 void FChunkThread::Stop() {

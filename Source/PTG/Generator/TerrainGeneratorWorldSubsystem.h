@@ -2,7 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "Subsystems/WorldSubsystem.h"
-#include "Chunk_Type.h"
+#include "ChunkData.h"
 #include "TerrainGeneratorWorldSubsystem.generated.h"
 
 class UProceduralMeshComponent;
@@ -14,16 +14,26 @@ class PTG_API UTerrainGeneratorWorldSubsystem : public UWorldSubsystem
 	GENERATED_BODY()
 
 public:
+	FOnChunkGenerationComplete OnChunkGenerationComplete;
+	
 	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
 	virtual void Deinitialize() override;
 
-	void DisplayChunk(const FChunk& Chunk, UProceduralMeshComponent* ProceduralMesh) const;
-	void GenerateChunk(int _x, int _y, int _size, FPerlinParameters _parameters);
+	void GenerateChunk(int32 X, int32 Y, int32 Size, const FPerlinParameters& Parameters);
+	void DisplayChunk(int64 ChunkId);
+	bool DestroyChunk(int64 ChunkId);
+	
+	FORCEINLINE void SetProceduralMesh(UProceduralMeshComponent* _proceduralMesh) { ProceduralMesh = _proceduralMesh; }
 
-	void OnChunkCalcOver(FString _id, FChunk _chunk);
+	bool HasChunk(int64 ChunkId) const { return ChunkMap.Contains(ChunkId); }
+	const FChunk* GetChunk(int64 ChunkId) const { return ChunkMap.Find(ChunkId); }
 
-	void SetProceduralMesh(UProceduralMeshComponent* _proceduralMesh) { ProceduralMesh = _proceduralMesh; };
+private:
+	void DisplayChunkInternal(const FChunk& Chunk);
 
-	TMap<FString, FChunk> ChunkMap;
+	UPROPERTY()
+	TMap<int64, FChunk> ChunkMap;
+
+	UPROPERTY()
 	UProceduralMeshComponent* ProceduralMesh;
 };
