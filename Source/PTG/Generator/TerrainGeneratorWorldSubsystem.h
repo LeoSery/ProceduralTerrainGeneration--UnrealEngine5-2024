@@ -2,10 +2,10 @@
 
 #include "CoreMinimal.h"
 #include "Subsystems/WorldSubsystem.h"
+#include "Chunk_Type.h"
 #include "TerrainGeneratorWorldSubsystem.generated.h"
 
 class UProceduralMeshComponent;
-struct FChunk;
 struct FPerlinParameters;
 
 UCLASS()
