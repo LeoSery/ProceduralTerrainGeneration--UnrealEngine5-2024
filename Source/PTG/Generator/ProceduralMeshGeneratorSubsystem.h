@@ -13,13 +13,10 @@ class PTG_API UProceduralMeshGeneratorSubsystem : public UGameInstanceSubsystem
 public:
 	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
 	virtual void Deinitialize() override;
-
+	
 	UFUNCTION()
-	void CreateTriangleMesh(UProceduralMeshComponent* ProceduralMesh, FVector Point1, FVector Point2, FVector Point3, int32 SectionIndex);
-
-	UFUNCTION()
-	void CreateSquareMesh(UProceduralMeshComponent* ProceduralMesh, FVector Point1, FVector Point2, FVector Point3, FVector Point4, int32 SectionIndex);
-
+	void CreateChunkMesh(UProceduralMeshComponent* ProceduralMesh, const FChunk& Chunk, int32 SectionIndex = 0);
+	
 	struct FSquareIndices 
 	{
 		int32 bottomLeft;
@@ -27,8 +24,6 @@ public:
 		int32 topLeft;
 		int32 topRight;
 	};
-	
-	void CreateChunkMesh(UProceduralMeshComponent* ProceduralMesh, const FChunk& Chunk, int32 SectionIndex = 0);
 	
 	FORCEINLINE FSquareIndices GetSquareIndices(int32 x, int32 y, int32 gridSize)
 	{

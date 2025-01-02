@@ -12,91 +12,6 @@ void UProceduralMeshGeneratorSubsystem::Deinitialize()
 	Super::Deinitialize();
 }
 
-void UProceduralMeshGeneratorSubsystem::CreateTriangleMesh(UProceduralMeshComponent* ProceduralMesh, FVector Point1, FVector Point2, FVector Point3, int32 SectionIndex)
-{
-	TArray<FVector> Vertices;
-	Vertices.Add(Point1);
-	Vertices.Add(Point2);
-	Vertices.Add(Point3);
-
-	TArray<int32> Triangles;
-	Triangles.Add(0);
-	Triangles.Add(1);
-	Triangles.Add(2);
-
-	TArray<FVector> Normals;
-	FVector Edge1 = Point3 - Point1;
-	FVector Edge2 = Point2 - Point1;
-	FVector Normal = FVector::CrossProduct(Edge1, Edge2).GetSafeNormal();
-
-	for (int32 i = 0; i < Vertices.Num(); ++i)
-	{
-		Normals.Add(Normal);
-	}
-
-	TArray<FVector2D> UVs;
-	UVs.Add(FVector2D(0, 0));
-	UVs.Add(FVector2D(1, 0));
-	UVs.Add(FVector2D(0, 1));
-
-	ProceduralMesh->CreateMeshSection_LinearColor(
-		SectionIndex,
-		Vertices,
-		Triangles,
-		Normals,
-		UVs,
-		TArray<FLinearColor>(),
-		TArray<FProcMeshTangent>(),
-		true
-	);
-}
-
-void UProceduralMeshGeneratorSubsystem::CreateSquareMesh(UProceduralMeshComponent* ProceduralMesh, FVector Point1, FVector Point2, FVector Point3, FVector Point4, int32 SectionIndex)
-{
-	TArray<FVector> Vertices;
-	Vertices.Add(Point1); // bottom-left corner
-	Vertices.Add(Point2); // bottom-right corner
-	Vertices.Add(Point3); // top-left corner
-	Vertices.Add(Point4); // top-right corner
-
-	TArray<int32> Triangles;
-	// first triangle
-	Triangles.Add(0);
-	Triangles.Add(2);
-	Triangles.Add(1);
-	// second triangle
-	Triangles.Add(2);
-	Triangles.Add(3);
-	Triangles.Add(1);
-
-	TArray<FVector> Normals;
-	FVector Edge1 = Point2 - Point1;
-	FVector Edge2 = Point3 - Point1;
-	FVector Normal = FVector::CrossProduct(Edge1, Edge2).GetSafeNormal();
-
-	for (int32 i = 0; i < Vertices.Num(); ++i)
-	{
-		Normals.Add(Normal);
-	}
-
-	TArray<FVector2D> UVs;
-	UVs.Add(FVector2D(0, 0));
-	UVs.Add(FVector2D(1, 0));
-	UVs.Add(FVector2D(0, 1));
-	UVs.Add(FVector2D(1, 1));
-
-	ProceduralMesh->CreateMeshSection_LinearColor(
-		SectionIndex,
-		Vertices,
-		Triangles,
-		Normals,
-		UVs,
-		TArray<FLinearColor>(),
-		TArray<FProcMeshTangent>(),
-		true
-	);
-}
-
 void UProceduralMeshGeneratorSubsystem::CreateChunkMesh(UProceduralMeshComponent* ProceduralMesh, const FChunk& Chunk, int32 SectionIndex)
 {
 	TArray<FVector> Vertices;
@@ -117,7 +32,6 @@ void UProceduralMeshGeneratorSubsystem::CreateChunkMesh(UProceduralMeshComponent
 		for (int32 x = 0; x < Chunk.Size; x++)
 		{
 			int32 Index = x + y * Chunk.Size;
-			
 			Vertices.Add(Chunk.VertexArray[Index].Coords);
 			
 			float U = static_cast<float>(x) / (Chunk.Size - 1);
@@ -132,18 +46,50 @@ void UProceduralMeshGeneratorSubsystem::CreateChunkMesh(UProceduralMeshComponent
 	{
 		for (int32 x = 0; x < Chunk.Size - 1; x++)
 		{
-			int32 BottomLeft = x + y * Chunk.Size;
-			int32 BottomRight = (x + 1) + y * Chunk.Size;
-			int32 TopLeft = x + (y + 1) * Chunk.Size;
-			int32 TopRight = (x + 1) + (y + 1) * Chunk.Size;
+			FSquareIndices Square = GetSquareIndices(x, y, Chunk.Size);
 			
-			Triangles.Add(BottomLeft);
-			Triangles.Add(TopLeft);
-			Triangles.Add(BottomRight);
-			
-			Triangles.Add(TopLeft);
-			Triangles.Add(TopRight);
-			Triangles.Add(BottomRight);
+			Triangles.Add(Square.bottomLeft);
+			Triangles.Add(Square.topLeft);
+			Triangles.Add(Square.bottomRight);
+            
+			Triangles.Add(Square.topLeft);
+			Triangles.Add(Square.topRight);
+			Triangles.Add(Square.bottomRight);
+		}
+	}
+
+	Normals.SetNum(Vertices.Num());
+
+	for (FVector& Normal : Normals)
+	{
+		Normal = FVector::ZeroVector;
+	}
+	
+	for (int32 i = 0; i < Triangles.Num(); i += 3)
+	{
+		const FVector& V0 = Vertices[Triangles[i]];
+		const FVector& V1 = Vertices[Triangles[i + 1]];
+		const FVector& V2 = Vertices[Triangles[i + 2]];
+
+		const FVector Edge1 = V1 - V0;
+		const FVector Edge2 = V2 - V0;
+		const FVector TriangleNormal = FVector::CrossProduct(Edge2, Edge1).GetSafeNormal();
+		
+		Normals[Triangles[i]] += TriangleNormal;
+		Normals[Triangles[i + 1]] += TriangleNormal;
+		Normals[Triangles[i + 2]] += TriangleNormal;
+	}
+
+	// Normalize all normals
+	for (FVector& Normal : Normals)
+	{
+		if (!Normal.IsNearlyZero())
+		{
+			Normal.Normalize();
+		}
+		else
+		{
+			Normal = FVector(0, 0, 1);
 		}
 	}
 

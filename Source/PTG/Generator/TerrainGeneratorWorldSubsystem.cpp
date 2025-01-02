@@ -59,6 +59,8 @@ void UTerrainGeneratorWorldSubsystem::DisplayChunkInternal(const FChunk& Chunk)
 	FGenerationStats& Stats = GenerationStats.Add(Chunk.Id);
 	Stats.StartTime = FPlatformTime::Seconds();
 	Stats.ChunkSize = Chunk.Size;
+	Stats.VertexCount = Chunk.Size * Chunk.Size;
+	Stats.TriangleCount = (Chunk.Size - 1) * (Chunk.Size - 1) * 2;
 	
 	AActor* MeshOwner = nullptr;
 	if (AActor* const* ExistingMeshOwner = MeshMap.Find(Chunk.Id))
@@ -94,11 +96,11 @@ void UTerrainGeneratorWorldSubsystem::DisplayChunkInternal(const FChunk& Chunk)
 
 	Stats.VertexCount = Chunk.Size * Chunk.Size;
 	Stats.TriangleCount = (Chunk.Size - 1) * (Chunk.Size - 1) * 2;
-	
 	Stats.EndTime = FPlatformTime::Seconds();
 	double GenerationTime = (Stats.EndTime - Stats.StartTime) * 1000;
+	
 	UE_LOG(LogTemp, Warning, TEXT("Chunk %lld Generation Stats:"), Chunk.Id);
-	UE_LOG(LogTemp, Warning, TEXT("  Time: %.2f ms"), GenerationTime);
+	UE_LOG(LogTemp, Warning, TEXT("  Generation Time: %.2f ms"), GenerationTime);
 	UE_LOG(LogTemp, Warning, TEXT("  Size: %d x %d"), Stats.ChunkSize, Stats.ChunkSize);
 	UE_LOG(LogTemp, Warning, TEXT("  Vertices: %d"), Stats.VertexCount);
 	UE_LOG(LogTemp, Warning, TEXT("  Triangles: %d"), Stats.TriangleCount);
