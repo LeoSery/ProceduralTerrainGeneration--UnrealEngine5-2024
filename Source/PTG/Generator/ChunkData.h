@@ -22,17 +22,20 @@ struct FPerlinParameters
 {
 	GENERATED_BODY()
 
-	UPROPERTY()
+	UPROPERTY(EditAnywhere)
 	int32 Octaves;
 
-	UPROPERTY()
+	UPROPERTY(EditAnywhere)
 	float Frequency;
 
-	UPROPERTY()
+	UPROPERTY(EditAnywhere)
 	float Persistence;
 
-	UPROPERTY()
+	UPROPERTY(EditAnywhere)
 	int32 Seed;
+
+	UPROPERTY(EditAnywhere)
+	int32 HeightFactor;
 };
 
 USTRUCT()

@@ -6,6 +6,12 @@ AChunkManager::AChunkManager()
 {
 	PrimaryActorTick.bCanEverTick = false;
 	
+	Parameters.Frequency = 0.1f;
+	Parameters.Octaves = 4;
+	Parameters.Persistence = 0.5f;
+	Parameters.Seed = 4;
+	Parameters.HeightFactor = 100;
+
 
 }
 
@@ -53,11 +59,7 @@ void AChunkManager::RequestChunkGeneration(int32 X, int32 Y, int32 Size)
 	if (TerrainGenerator)
 	{
 		// Hard-coded parameters for system testing
-		FPerlinParameters Parameters;
-		Parameters.Frequency = 0.1f;
-		Parameters.Octaves = 4;
-		Parameters.Persistence = 0.5f;
-		Parameters.Seed = 4;
+		
 
 		TerrainGenerator->GenerateChunk(X, Y, Size, Parameters);
 	}

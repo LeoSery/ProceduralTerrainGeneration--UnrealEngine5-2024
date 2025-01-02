@@ -19,11 +19,12 @@ public:
 	virtual uint32 Run() override;
 	virtual void Exit() override;
 	virtual void Stop() override;
-	
+
 	FRunnableThread* Thread;
 	FChunk Chunk;
 	FPerlinParameters Parameters;
 	bool bShutdown = false;
 	bool bisOver = false;
 	FChunkDelegate OnCalcOver;
+	FCriticalSection ChunkLock;
 };

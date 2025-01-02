@@ -34,4 +34,7 @@ private:
 	void RequestChunkGeneration(int32 X, int32 Y, int32 Size);
 	UFUNCTION(BlueprintCallable)
 	void RequestChunkDestruction(int64 ChunkId);
+
+	UPROPERTY(EditAnywhere);
+	FPerlinParameters Parameters;
 };
