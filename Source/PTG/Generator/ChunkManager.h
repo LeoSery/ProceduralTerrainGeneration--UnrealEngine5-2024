@@ -20,9 +20,7 @@ protected:
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override; // like a destructor for unsubscribing to delegates
 	
 private:
-	UPROPERTY(VisibleAnywhere)
-	UProceduralMeshComponent* ProceduralMesh;
-	
+
 	UPROPERTY()
 	UTerrainGeneratorWorldSubsystem* TerrainGenerator;
 
@@ -32,6 +30,8 @@ private:
 	UFUNCTION()
 	void OnChunkGenerated(int64 ChunkId);
 
+	UFUNCTION(BlueprintCallable)
 	void RequestChunkGeneration(int32 X, int32 Y, int32 Size);
+	UFUNCTION(BlueprintCallable)
 	void RequestChunkDestruction(int64 ChunkId);
 };

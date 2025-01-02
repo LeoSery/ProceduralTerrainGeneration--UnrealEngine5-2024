@@ -3,9 +3,9 @@
 #include "CoreMinimal.h"
 #include "Subsystems/WorldSubsystem.h"
 #include "ChunkData.h"
+#include "ProceduralMeshComponent.h"
 #include "TerrainGeneratorWorldSubsystem.generated.h"
 
-class UProceduralMeshComponent;
 struct FPerlinParameters;
 
 UCLASS()
@@ -22,8 +22,7 @@ public:
 	void GenerateChunk(int32 X, int32 Y, int32 Size, const FPerlinParameters& Parameters);
 	void DisplayChunk(int64 ChunkId);
 	bool DestroyChunk(int64 ChunkId);
-	
-	FORCEINLINE void SetProceduralMesh(UProceduralMeshComponent* _proceduralMesh) { ProceduralMesh = _proceduralMesh; }
+	void OnChunkCalcOver(int64 _id, FChunk _chunk);
 
 	bool HasChunk(int64 ChunkId) const { return ChunkMap.Contains(ChunkId); }
 	const FChunk* GetChunk(int64 ChunkId) const { return ChunkMap.Find(ChunkId); }
@@ -33,7 +32,8 @@ private:
 
 	UPROPERTY()
 	TMap<int64, FChunk> ChunkMap;
-
 	UPROPERTY()
-	UProceduralMeshComponent* ProceduralMesh;
+	TMap<int64, AActor*> MeshMap;
+
+	
 };

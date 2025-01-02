@@ -6,8 +6,7 @@ AChunkManager::AChunkManager()
 {
 	PrimaryActorTick.bCanEverTick = false;
 	
-	ProceduralMesh = CreateDefaultSubobject<UProceduralMeshComponent>(TEXT("ProceduralMesh"));
-	RootComponent = ProceduralMesh;
+
 }
 
 void AChunkManager::BeginPlay()
@@ -19,11 +18,9 @@ void AChunkManager::BeginPlay()
 
 	if (TerrainGenerator)
 	{
-		TerrainGenerator->SetProceduralMesh(ProceduralMesh);
 		TerrainGenerator->OnChunkGenerationComplete.AddUObject(this, &AChunkManager::OnChunkGenerated);
 	}
 
-	ProceduralMesh->ClearAllMeshSections();
 	RequestChunkGeneration(0, 0, 32);
 }
 
@@ -52,6 +49,7 @@ void AChunkManager::OnChunkGenerated(int64 ChunkId)
 
 void AChunkManager::RequestChunkGeneration(int32 X, int32 Y, int32 Size)
 {
+	UE_LOG(LogTemp, Warning, TEXT("Requested Chunk Generation"));
 	if (TerrainGenerator)
 	{
 		// Hard-coded parameters for system testing
