@@ -15,8 +15,9 @@ uint32 FChunkThread::Run() {
 	int _size = Chunk.Size;
 	int _x = Chunk.Coords.X;
 	int _y = Chunk.Coords.Y;
-	const int BatchSize = 30;
+	const int BatchSize = 100;
 	int processedVertices = 0;
+	const int32 totalVertices = _size * _size;
 	TArray<FVertices> TempVertices;
 	TempVertices.Reserve(_size * _size);
 
@@ -30,12 +31,18 @@ uint32 FChunkThread::Run() {
 			if (processedVertices % BatchSize == 0) {
 				FPlatformProcess::Sleep(0.001f);
 			}
-		}
-	}
 
-	{
-		FScopeLock Lock(&ChunkLock);
-		Chunk.VertexArray.Append(TempVertices);
+			// When we reach batch size or finish processing, update the main array
+			if (TempVertices.Num() >= BatchSize || processedVertices >= totalVertices) {
+				FScopeLock Lock(&ChunkLock);
+				Chunk.VertexArray.Append(TempVertices);
+				TempVertices.Reset();
+
+				// Small sleep after each batch
+				FPlatformProcess::Sleep(0.001f);
+			}
+
+		}
 	}
 
 	return 1;

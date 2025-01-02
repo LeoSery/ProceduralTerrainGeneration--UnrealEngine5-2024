@@ -56,7 +56,7 @@ void UTerrainGeneratorWorldSubsystem::OnChunkCalcOver(int64 _id, FChunk _chunk)
 
 void UTerrainGeneratorWorldSubsystem::DisplayChunkInternal(const FChunk& Chunk)
 {
-	AActor* MeshOwner = MeshMap.Find(Chunk.Id)[1];
+	AActor* MeshOwner = MeshMap.Find(Chunk.Id)[0];
 	if (MeshMap.Find(Chunk.Id)) {
 
 	}
@@ -88,7 +88,7 @@ void UTerrainGeneratorWorldSubsystem::DisplayChunkInternal(const FChunk& Chunk)
 				const auto Indices = MeshGenerator->GetSquareIndices(x, y, Chunk.Size);
                 
 				MeshGenerator->CreateSquareMesh(
-					ProceduralMesh,
+					MeshMap.Find(Chunk.Id)[0]->FindComponentByClass<UProceduralMeshComponent>(),
 					Chunk.VertexArray[Indices.bottomLeft].Coords,
 					Chunk.VertexArray[Indices.bottomRight].Coords,
 					Chunk.VertexArray[Indices.topLeft].Coords,
