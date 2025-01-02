@@ -56,9 +56,14 @@ void UTerrainGeneratorWorldSubsystem::OnChunkCalcOver(int64 _id, FChunk _chunk)
 
 void UTerrainGeneratorWorldSubsystem::DisplayChunkInternal(const FChunk& Chunk)
 {
-	AActor* MeshOwner = MeshMap.Find(Chunk.Id)[0];
-	if (MeshMap.Find(Chunk.Id)) {
-
+	FGenerationStats& Stats = GenerationStats.Add(Chunk.Id);
+	Stats.StartTime = FPlatformTime::Seconds();
+	Stats.ChunkSize = Chunk.Size;
+	
+	AActor* MeshOwner = nullptr;
+	if (AActor* const* ExistingMeshOwner = MeshMap.Find(Chunk.Id))
+	{
+		MeshOwner = *ExistingMeshOwner;
 	}
 	else {
 		MeshOwner = GetWorld()->SpawnActor<AActor>();
@@ -78,24 +83,23 @@ void UTerrainGeneratorWorldSubsystem::DisplayChunkInternal(const FChunk& Chunk)
 		MeshMap.Emplace(Chunk.Id, MeshOwner);
 	}
 	
-
 	if (UProceduralMeshGeneratorSubsystem* MeshGenerator = GetWorld()->GetGameInstance()->GetSubsystem<UProceduralMeshGeneratorSubsystem>())
 	{
-		for (int32 x = 0; x < Chunk.Size - 1; x++)
-		{
-			for (int32 y = 0; y < Chunk.Size - 1; y++)
-			{
-				const auto Indices = MeshGenerator->GetSquareIndices(x, y, Chunk.Size);
-                
-				MeshGenerator->CreateSquareMesh(
-					MeshMap.Find(Chunk.Id)[0]->FindComponentByClass<UProceduralMeshComponent>(),
-					Chunk.VertexArray[Indices.bottomLeft].Coords,
-					Chunk.VertexArray[Indices.bottomRight].Coords,
-					Chunk.VertexArray[Indices.topLeft].Coords,
-					Chunk.VertexArray[Indices.topRight].Coords,
-					x + y * (Chunk.Size - 1)
-				);
-			}
-		}
+		MeshGenerator->CreateChunkMesh(
+			MeshOwner->FindComponentByClass<UProceduralMeshComponent>(),
+			Chunk,
+			0
+		);
 	}
+
+	Stats.VertexCount = Chunk.Size * Chunk.Size;
+	Stats.TriangleCount = (Chunk.Size - 1) * (Chunk.Size - 1) * 2;
+	
+	Stats.EndTime = FPlatformTime::Seconds();
+	double GenerationTime = (Stats.EndTime - Stats.StartTime) * 1000;
+	UE_LOG(LogTemp, Warning, TEXT("Chunk %lld Generation Stats:"), Chunk.Id);
+	UE_LOG(LogTemp, Warning, TEXT("  Time: %.2f ms"), GenerationTime);
+	UE_LOG(LogTemp, Warning, TEXT("  Size: %d x %d"), Stats.ChunkSize, Stats.ChunkSize);
+	UE_LOG(LogTemp, Warning, TEXT("  Vertices: %d"), Stats.VertexCount);
+	UE_LOG(LogTemp, Warning, TEXT("  Triangles: %d"), Stats.TriangleCount);
 }

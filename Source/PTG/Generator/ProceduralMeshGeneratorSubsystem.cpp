@@ -96,3 +96,65 @@ void UProceduralMeshGeneratorSubsystem::CreateSquareMesh(UProceduralMeshComponen
 		true
 	);
 }
+
+void UProceduralMeshGeneratorSubsystem::CreateChunkMesh(UProceduralMeshComponent* ProceduralMesh, const FChunk& Chunk, int32 SectionIndex)
+{
+	TArray<FVector> Vertices;
+	TArray<int32> Triangles;
+	TArray<FVector> Normals;
+	TArray<FVector2D> UVs;
+
+	const int32 NumVertices = Chunk.Size * Chunk.Size;
+	const int32 NumTriangles = (Chunk.Size - 1) * (Chunk.Size - 1) * 2 * 3;
+
+	Vertices.Reserve(NumVertices);
+	Triangles.Reserve(NumTriangles);
+	Normals.Reserve(NumVertices);
+	UVs.Reserve(NumVertices);
+
+	for (int32 y = 0; y < Chunk.Size; y++)
+	{
+		for (int32 x = 0; x < Chunk.Size; x++)
+		{
+			int32 Index = x + y * Chunk.Size;
+			
+			Vertices.Add(Chunk.VertexArray[Index].Coords);
+			
+			float U = static_cast<float>(x) / (Chunk.Size - 1);
+			float V = static_cast<float>(y) / (Chunk.Size - 1);
+			UVs.Add(FVector2D(U, V));
+			
+			Normals.Add(FVector(0.0f, 0.0f, 1.0f));
+		}
+	}
+
+	for (int32 y = 0; y < Chunk.Size - 1; y++)
+	{
+		for (int32 x = 0; x < Chunk.Size - 1; x++)
+		{
+			int32 BottomLeft = x + y * Chunk.Size;
+			int32 BottomRight = (x + 1) + y * Chunk.Size;
+			int32 TopLeft = x + (y + 1) * Chunk.Size;
+			int32 TopRight = (x + 1) + (y + 1) * Chunk.Size;
+			
+			Triangles.Add(BottomLeft);
+			Triangles.Add(TopLeft);
+			Triangles.Add(BottomRight);
+			
+			Triangles.Add(TopLeft);
+			Triangles.Add(TopRight);
+			Triangles.Add(BottomRight);
+		}
+	}
+
+	ProceduralMesh->CreateMeshSection_LinearColor(
+		SectionIndex,
+		Vertices,
+		Triangles,
+		Normals,
+		UVs,
+		TArray<FLinearColor>(),
+		TArray<FProcMeshTangent>(),
+		true
+	);
+}

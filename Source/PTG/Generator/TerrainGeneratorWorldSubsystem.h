@@ -35,5 +35,14 @@ private:
 	UPROPERTY()
 	TMap<int64, AActor*> MeshMap;
 
-	
+	struct FGenerationStats 
+	{
+		double StartTime;
+		double EndTime;
+		int32 ChunkSize;
+		int32 VertexCount;
+		int32 TriangleCount;
+	};
+    
+	TMap<int64, FGenerationStats> GenerationStats;
 };

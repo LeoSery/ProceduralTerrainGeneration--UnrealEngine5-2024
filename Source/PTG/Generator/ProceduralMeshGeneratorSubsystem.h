@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "Subsystems/GameInstanceSubsystem.h"
+#include "ChunkData.h"
 #include "ProceduralMeshGeneratorSubsystem.generated.h"
 
 UCLASS()
@@ -26,7 +27,9 @@ public:
 		int32 topLeft;
 		int32 topRight;
 	};
-
+	
+	void CreateChunkMesh(UProceduralMeshComponent* ProceduralMesh, const FChunk& Chunk, int32 SectionIndex = 0);
+	
 	FORCEINLINE FSquareIndices GetSquareIndices(int32 x, int32 y, int32 gridSize)
 	{
 		return {
