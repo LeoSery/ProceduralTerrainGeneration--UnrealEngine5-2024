@@ -57,6 +57,9 @@ private:
 	UPROPERTY(EditAnywhere)
 	int32 RenderDistance;
 
+	UPROPERTY(EditAnywhere)
+	UMaterial* Material;
+
 	FVector PlayerPos;
 
 	TQueue<FVector2D> ChunkGenerationQueue;

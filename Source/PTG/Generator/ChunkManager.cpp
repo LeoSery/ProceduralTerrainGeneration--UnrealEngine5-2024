@@ -51,6 +51,8 @@ void AChunkManager::BeginPlay()
 	if (TerrainGenerator)
 	{
 		TerrainGenerator->OnChunkGenerationComplete.AddUObject(this, &AChunkManager::OnChunkGenerated);
+		TerrainGenerator->SetMaterial(Material);
+
 	}
 
 	InitialChunkGeneration();

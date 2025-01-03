@@ -4,6 +4,7 @@
 #include "Subsystems/WorldSubsystem.h"
 #include "ChunkData.h"
 #include "ProceduralMeshComponent.h"
+#include "Materials/Material.h"
 #include "TerrainGeneratorWorldSubsystem.generated.h"
 
 struct FPerlinParameters;
@@ -27,10 +28,14 @@ public:
 	bool HasChunk(int64 ChunkId) const { return ChunkMap.Contains(ChunkId); }
 	const FChunk* GetChunk(int64 ChunkId) const { return ChunkMap.Find(ChunkId); }
 
+	void SetMaterial(UMaterial* _material) { Material = _material; }
+
 	UPROPERTY()
 	TMap<int64, FChunk> ChunkMap;
 	UPROPERTY()
 	TMap<int64, AActor*> MeshMap;
+
+	UMaterial* Material;
 
 private:
 	void DisplayChunkInternal(const FChunk& Chunk);

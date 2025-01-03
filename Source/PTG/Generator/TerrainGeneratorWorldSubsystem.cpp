@@ -83,7 +83,10 @@ void UTerrainGeneratorWorldSubsystem::DisplayChunkInternal(const FChunk& Chunk)
 		// Attach the component to the actor's root
 		ProceduralMesh->SetupAttachment(MeshOwner->GetRootComponent());
 		ProceduralMesh->RegisterComponent();
-
+		if (Material) 
+		{
+			ProceduralMesh->SetMaterial(0, Material);
+		}
 		MeshMap.Emplace(Chunk.Id, MeshOwner);
 	}
 	
@@ -94,6 +97,7 @@ void UTerrainGeneratorWorldSubsystem::DisplayChunkInternal(const FChunk& Chunk)
 			Chunk,
 			0
 		);
+		
 	}
 
 	Stats.VertexCount = Chunk.Size * Chunk.Size;
