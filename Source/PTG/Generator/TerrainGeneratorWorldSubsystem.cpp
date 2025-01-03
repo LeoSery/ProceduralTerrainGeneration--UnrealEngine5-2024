@@ -13,7 +13,7 @@ void UTerrainGeneratorWorldSubsystem::Deinitialize()
 	Super::Deinitialize();
 }
 
-void UTerrainGeneratorWorldSubsystem::GenerateChunk(int32 X, int32 Y, int32 Size, const FPerlinParameters& Parameters)
+void UTerrainGeneratorWorldSubsystem::GenerateChunk(int32 X, int32 Y, int32 Size, const FPerlinParameters& TerrainParameters, const FPerlinParameters& BiomesParameters)
 {
 	FChunk NewChunk;
 	NewChunk.Size = Size;
@@ -21,7 +21,7 @@ void UTerrainGeneratorWorldSubsystem::GenerateChunk(int32 X, int32 Y, int32 Size
 	NewChunk.Id = ChunkData::MakeChunkId(X, Y);
 
 	ChunkMap.Add(NewChunk.Id, NewChunk);
-	FChunkThread* Thread = new FChunkThread(NewChunk,Parameters);
+	FChunkThread* Thread = new FChunkThread(NewChunk, TerrainParameters,BiomesParameters);
 	Thread->OnCalcOver.AddUObject(this, &UTerrainGeneratorWorldSubsystem::OnChunkCalcOver);
 	
 }

@@ -25,7 +25,10 @@ uint32 FChunkThread::Run()
 		for (int x = _x,x_scaled = _x*100; x < _x + _size; x++,x_scaled+=100)
 		{
 			FVertices vertex;
-			vertex.Coords = FVector(x_scaled, y_scaled, (UPerlinNoise::GenerateOctavePerlinValue(x, y, Parameters.Octaves, Parameters.Persistence, Parameters.Frequency, Parameters.Seed)) * Parameters.HeightFactor);
+			vertex.Coords = FVector(x_scaled, y_scaled, (FMath::GetMappedRangeValueClamped(FVector2D(-1, 1), FVector2D(0, 1), UPerlinNoise::GenerateOctavePerlinValue(x, y, Parameters.Octaves, Parameters.Persistence, Parameters.Frequency, Parameters.Seed)))
+				* (Parameters.HeightFactor
+					* FMath::GetMappedRangeValueClamped(FVector2D(-1,1),FVector2D(0,2), UPerlinNoise::GenerateOctavePerlinValue(x, y, BiomeParameters.Octaves, BiomeParameters.Persistence, BiomeParameters.Frequency, BiomeParameters.Seed))
+					* BiomeParameters.HeightFactor));
 			vertex.Normal = FVector(0.0f, 0.0f, 1.0f);
 			TempVertices.Add(vertex);
 			processedVertices++;

@@ -9,7 +9,7 @@ class FChunkThread : public FRunnable
 {
 public:
 
-	FChunkThread(FChunk _chunk,FPerlinParameters _parameters) : Chunk(_chunk), Parameters(_parameters)
+	FChunkThread(FChunk _chunk,FPerlinParameters _parameters, FPerlinParameters _biomeParameters) : Chunk(_chunk), Parameters(_parameters), BiomeParameters(_biomeParameters)
 	{
 		Thread = FRunnableThread::Create(this, TEXT("MyThread"), 0, TPri_BelowNormal);
 	};
@@ -22,6 +22,7 @@ public:
 	FRunnableThread* Thread;
 	FChunk Chunk;
 	FPerlinParameters Parameters;
+	FPerlinParameters BiomeParameters;
 	bool bShutdown = false;
 	bool bisOver = false;
 	FChunkDelegate OnCalcOver;

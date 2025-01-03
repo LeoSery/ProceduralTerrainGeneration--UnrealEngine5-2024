@@ -46,7 +46,10 @@ private:
 	void RequestChunkDestruction(int64 ChunkId);
 
 	UPROPERTY(EditAnywhere)
-	FPerlinParameters Parameters;
+	FPerlinParameters TerrainParameters;
+
+	UPROPERTY(EditAnywhere)
+	FPerlinParameters BiomesParameters;
 
 	UPROPERTY(EditAnywhere)
 	int32 ChunkSize;

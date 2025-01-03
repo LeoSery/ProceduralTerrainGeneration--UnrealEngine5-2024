@@ -6,12 +6,18 @@
 AChunkManager::AChunkManager(): TerrainGenerator(nullptr), MeshGenerator(nullptr)
 {
 	PrimaryActorTick.bCanEverTick = false;
+	
+	TerrainParameters.Frequency = 0.1f;
+	TerrainParameters.Octaves = 4;
+	TerrainParameters.Persistence = 0.5f;
+	TerrainParameters.Seed = 420;
+	TerrainParameters.HeightFactor = 100;
 
-	Parameters.Frequency = 0.1f;
-	Parameters.Octaves = 4;
-	Parameters.Persistence = 0.5f;
-	Parameters.Seed = 4;
-	Parameters.HeightFactor = 100;
+	BiomesParameters.Frequency = 0.01f;
+	BiomesParameters.Octaves = 1;
+	BiomesParameters.Persistence = 0.5f;
+	BiomesParameters.Seed = 69;
+	BiomesParameters.HeightFactor = 0;
 
 	ChunkSize = 32;
 	RenderDistance = 2;
@@ -198,7 +204,8 @@ void AChunkManager::RequestChunkGeneration(int32 X, int32 Y, int32 Size)
 	
 	if (TerrainGenerator)
 	{
-		TerrainGenerator->GenerateChunk(X, Y, Size, Parameters);
+		// Hard-coded parameters for system testing
+		TerrainGenerator->GenerateChunk(X, Y, Size, TerrainParameters,BiomesParameters);
 	}
 }
 

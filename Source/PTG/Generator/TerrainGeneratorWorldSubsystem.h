@@ -19,7 +19,7 @@ public:
 	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
 	virtual void Deinitialize() override;
 
-	void GenerateChunk(int32 X, int32 Y, int32 Size, const FPerlinParameters& Parameters);
+	void GenerateChunk(int32 X, int32 Y, int32 Size, const FPerlinParameters& Parameters, const FPerlinParameters& BiomesParameters);
 	void DisplayChunk(int64 ChunkId);
 	bool DestroyChunk(int64 ChunkId);
 	void OnChunkCalcOver(int64 _id, FChunk _chunk);
