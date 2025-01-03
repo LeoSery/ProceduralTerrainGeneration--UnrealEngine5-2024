@@ -70,4 +70,10 @@ private:
 	bool bStressTestInProgress = false;
 	double StressTestStartTime = 0.0;
 	int32 PendingChunks = 0;
+
+	bool bInitialChunksGenerated;
+	int32 InitialChunksRemaining;
+    
+	UFUNCTION()
+	void EnablePlayerMovement();
 };

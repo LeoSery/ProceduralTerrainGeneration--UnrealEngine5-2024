@@ -58,14 +58,8 @@ struct FChunk
 
 namespace ChunkData
 {
-	FORCEINLINE int64 MakeChunkId(int32 X, int32 Y)
+	FORCEINLINE int64 GetChunkIdFromCoordinates(int32 X, int32 Y)
 	{
 		return ((int64)X << 32) | ((int64)Y & 0xFFFFFFFF);
-	}
-
-	FORCEINLINE void GetChunkCoords(int64 Id, int32& OutX, int32& OutY)
-	{
-		OutX = (int32)(Id >> 32);
-		OutY = (int32)(Id & 0xFFFFFFFF);
 	}
 }

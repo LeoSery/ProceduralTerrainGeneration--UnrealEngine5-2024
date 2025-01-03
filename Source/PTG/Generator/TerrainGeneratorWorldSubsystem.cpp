@@ -18,7 +18,7 @@ void UTerrainGeneratorWorldSubsystem::GenerateChunk(int32 X, int32 Y, int32 Size
 	FChunk NewChunk;
 	NewChunk.Size = Size;
 	NewChunk.Coords = FVector(X, Y, 0);
-	NewChunk.Id = ChunkData::MakeChunkId(X, Y);
+	NewChunk.Id = ChunkData::GetChunkIdFromCoordinates(X, Y);
 
 	ChunkMap.Add(NewChunk.Id, NewChunk);
 	FChunkThread* Thread = new FChunkThread(NewChunk, TerrainParameters,BiomesParameters);

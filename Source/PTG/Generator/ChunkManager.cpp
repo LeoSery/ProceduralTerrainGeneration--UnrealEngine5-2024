@@ -1,5 +1,7 @@
 ﻿#include "ChunkManager.h"
 #include "TerrainGeneratorWorldSubsystem.h"
+#include "GameFramework/Character.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/PlayerStart.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -42,6 +44,8 @@ void AChunkManager::BeginPlay()
 {
 	Super::BeginPlay();
 
+	bInitialChunksGenerated = false;
+
 	TerrainGenerator = GetWorld()->GetSubsystem<UTerrainGeneratorWorldSubsystem>();
 	MeshGenerator = GetGameInstance()->GetSubsystem<UProceduralMeshGeneratorSubsystem>();
 
@@ -81,7 +85,7 @@ void AChunkManager::Tick(float DeltaTime)
 		{
 			for (int x = PlayerPos.X - RenderDistance; x < PlayerPos.X + RenderDistance; x++)
 			{
-				if (!TerrainGenerator->HasChunk(ChunkData::MakeChunkId(x * (ChunkSize - 1), y * (ChunkSize - 1))))
+				if (!TerrainGenerator->HasChunk(ChunkData::GetChunkIdFromCoordinates(x * (ChunkSize - 1), y * (ChunkSize - 1))))
 				{
 					ChunkGenerationQueue.Enqueue(FVector2D(x, y));
 				}
@@ -136,6 +140,13 @@ void AChunkManager::Tick(float DeltaTime)
 
 void AChunkManager::InitialChunkGeneration()
 {
+	InitialChunksRemaining = (2 * RenderDistance + 1) * (2 * RenderDistance + 1);
+
+	if (ACharacter* PlayerCharacter = Cast<ACharacter>(GetWorld()->GetFirstPlayerController()->GetPawn()))
+	{
+		PlayerCharacter->GetCharacterMovement()->SetMovementMode(MOVE_Flying);
+	}
+	
 	// Generate center chunk first (at 0,0)
 	RequestChunkGeneration(0, 0, ChunkSize);
 
@@ -160,21 +171,37 @@ void AChunkManager::InitialChunkGeneration()
 void AChunkManager::SpawnPlayer()
 {
 	FVector InitialChunkCenter(
-		(ChunkSize-1) * 100 / 2.0f,  // x center
-		(ChunkSize-1) * 100 / 2.0f,  // y center
-		200.0f                       // z height above terrain
+		(ChunkSize-1) * 100 / 2.0f,  
+		(ChunkSize-1) * 100 / 2.0f,  
+		200.0f                       
 	);
 	
-	if (APlayerStart* PlayerStart = Cast<APlayerStart>(UGameplayStatics::GetActorOfClass(GetWorld(), APlayerStart::StaticClass())))
-	{
-		PlayerStart->SetActorLocation(InitialChunkCenter);
-		
-		PlayerPos = FVector(0, 0, 0);
-	}
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+    
+	APlayerStart* NewPlayerStart = GetWorld()->SpawnActor<APlayerStart>(
+		APlayerStart::StaticClass(),
+		InitialChunkCenter,
+		FRotator::ZeroRotator,
+		SpawnParams
+	);
+    
+	PlayerPos = FVector(0, 0, 0);
 }
 
 void AChunkManager::OnChunkGenerated(int64 ChunkId)
 {
+	if (!bInitialChunksGenerated)
+	{
+		InitialChunksRemaining--;
+        
+		if (InitialChunksRemaining <= 0)
+		{
+			bInitialChunksGenerated = true;
+			EnablePlayerMovement();
+		}
+	}
+	
 	if (bStressTestInProgress)
 	{
 		PendingChunks--;
@@ -214,5 +241,13 @@ void AChunkManager::RequestChunkDestruction(int64 ChunkId)
 	if (TerrainGenerator)
 	{
 		TerrainGenerator->DestroyChunk(ChunkId);
+	}
+}
+
+void AChunkManager::EnablePlayerMovement()
+{
+	if (ACharacter* PlayerCharacter = Cast<ACharacter>(GetWorld()->GetFirstPlayerController()->GetPawn()))
+	{
+		PlayerCharacter->GetCharacterMovement()->SetMovementMode(MOVE_Walking);
 	}
 }
