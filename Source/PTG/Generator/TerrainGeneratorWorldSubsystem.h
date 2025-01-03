@@ -27,13 +27,15 @@ public:
 	bool HasChunk(int64 ChunkId) const { return ChunkMap.Contains(ChunkId); }
 	const FChunk* GetChunk(int64 ChunkId) const { return ChunkMap.Find(ChunkId); }
 
-private:
-	void DisplayChunkInternal(const FChunk& Chunk);
-
 	UPROPERTY()
 	TMap<int64, FChunk> ChunkMap;
 	UPROPERTY()
 	TMap<int64, AActor*> MeshMap;
+
+private:
+	void DisplayChunkInternal(const FChunk& Chunk);
+
+	
 
 	struct FGenerationStats 
 	{

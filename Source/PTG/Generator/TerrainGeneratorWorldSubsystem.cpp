@@ -39,6 +39,8 @@ bool UTerrainGeneratorWorldSubsystem::DestroyChunk(int64 ChunkId)
 	if (MeshMap.Find(ChunkId) && ChunkMap.Find(ChunkId))
 	{
 		// TODO: Add logic to clean chunk procedural mesh sections
+		AActor* Mesh = MeshMap.FindAndRemoveChecked(ChunkId);
+		Mesh->Destroy();
 		return ChunkMap.Remove(ChunkId) > 0;
 	}
 	return false;

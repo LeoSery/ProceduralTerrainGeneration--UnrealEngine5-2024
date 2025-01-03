@@ -18,6 +18,7 @@ public:
 protected:
 	virtual void BeginPlay() override;
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override; // like a destructor for unsubscribing to delegates
+	virtual void Tick(float DeltaTime) override;
 	
 private:
 
@@ -35,6 +36,21 @@ private:
 	UFUNCTION(BlueprintCallable)
 	void RequestChunkDestruction(int64 ChunkId);
 
-	UPROPERTY(EditAnywhere);
+	UPROPERTY(EditAnywhere)
 	FPerlinParameters Parameters;
+
+	UPROPERTY(EditAnywhere)
+	int32 ChunkSize;
+
+	UPROPERTY(EditAnywhere)
+	int32 RenderDistance;
+
+	FVector PlayerPos;
+
+	TQueue<FVector2D> ChunkGenerationQueue;
+	TQueue<int64> ChunkDestructionQueue;
+	float TimeSinceLastChunkOperation = 0.0f;
+
+	UPROPERTY(EditAnywhere)
+	float ChunkOperationInterval = 0.05f;
 };
