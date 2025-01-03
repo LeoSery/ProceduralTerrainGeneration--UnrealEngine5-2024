@@ -3,7 +3,6 @@
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/PlayerStart.h"
-#include "Kismet/GameplayStatics.h"
 
 AChunkManager::AChunkManager(): TerrainGenerator(nullptr), MeshGenerator(nullptr)
 {
@@ -147,7 +146,6 @@ void AChunkManager::InitialChunkGeneration()
 		PlayerCharacter->GetCharacterMovement()->SetMovementMode(MOVE_Flying);
 	}
 	
-	// Generate center chunk first (at 0,0)
 	RequestChunkGeneration(0, 0, ChunkSize);
 
 	// Generate surrounding chunks
@@ -163,8 +161,6 @@ void AChunkManager::InitialChunkGeneration()
 			RequestChunkGeneration(x * (ChunkSize-1), y * (ChunkSize-1), ChunkSize);
 		}
 	}
-
-	// Spawn player in center of initial chunk
 	SpawnPlayer();
 }
 
@@ -198,7 +194,7 @@ void AChunkManager::OnChunkGenerated(int64 ChunkId)
 		if (InitialChunksRemaining <= 0)
 		{
 			bInitialChunksGenerated = true;
-			EnablePlayerMovement();
+			RepositionPlayerToGround();
 		}
 	}
 	
@@ -231,7 +227,6 @@ void AChunkManager::RequestChunkGeneration(int32 X, int32 Y, int32 Size)
 	
 	if (TerrainGenerator)
 	{
-		// Hard-coded parameters for system testing
 		TerrainGenerator->GenerateChunk(X, Y, Size, TerrainParameters,BiomesParameters);
 	}
 }
@@ -244,10 +239,28 @@ void AChunkManager::RequestChunkDestruction(int64 ChunkId)
 	}
 }
 
-void AChunkManager::EnablePlayerMovement()
+void AChunkManager::RepositionPlayerToGround()
 {
+	int64 CentralChunkId = ChunkData::GetChunkIdFromCoordinates(0, 0);
+	const FChunk* CentralChunk = TerrainGenerator->GetChunk(CentralChunkId);
+    
+	if (!CentralChunk || CentralChunk->VertexArray.Num() == 0)
+	{
+		return;
+	}
+	
+	int32 CenterX = (ChunkSize - 1) / 2;
+	int32 CenterY = (ChunkSize - 1) / 2;
+	int32 CenterIndex = CenterX + CenterY * ChunkSize;
+	
+	float TerrainHeight = CentralChunk->VertexArray[CenterIndex].Coords.Z;
+	
 	if (ACharacter* PlayerCharacter = Cast<ACharacter>(GetWorld()->GetFirstPlayerController()->GetPawn()))
 	{
+		FVector CurrentLocation = PlayerCharacter->GetActorLocation();
+		FVector NewLocation(CurrentLocation.X, CurrentLocation.Y, TerrainHeight + 100.0f);
+        
+		PlayerCharacter->SetActorLocation(NewLocation);
 		PlayerCharacter->GetCharacterMovement()->SetMovementMode(MOVE_Walking);
 	}
 }

@@ -73,7 +73,7 @@ private:
 
 	bool bInitialChunksGenerated;
 	int32 InitialChunksRemaining;
-    
+
 	UFUNCTION()
-	void EnablePlayerMovement();
+	void RepositionPlayerToGround();
 };
