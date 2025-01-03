@@ -1,11 +1,12 @@
 ﻿#include "ChunkManager.h"
-#include "ProceduralMeshComponent.h"
 #include "TerrainGeneratorWorldSubsystem.h"
+#include "GameFramework/PlayerStart.h"
+#include "Kismet/GameplayStatics.h"
 
-AChunkManager::AChunkManager()
+AChunkManager::AChunkManager(): TerrainGenerator(nullptr), MeshGenerator(nullptr)
 {
 	PrimaryActorTick.bCanEverTick = false;
-	
+
 	Parameters.Frequency = 0.1f;
 	Parameters.Octaves = 4;
 	Parameters.Persistence = 0.5f;
@@ -23,7 +24,7 @@ void AChunkManager::StressTest(int32 NumChunks)
 	bStressTestInProgress = true;
 	StressTestStartTime = FPlatformTime::Seconds();
     
-	UE_LOG(LogTemp, Warning, TEXT("Starting Stress Test (sleep) - Generating %d chunks"), NumChunks);
+	UE_LOG(LogTemp, Warning, TEXT("Starting Stress Test - Generating %d chunks"), NumChunks);
     
 	for(int32 i = 0; i < NumChunks; i++)
 	{
@@ -43,21 +44,7 @@ void AChunkManager::BeginPlay()
 		TerrainGenerator->OnChunkGenerationComplete.AddUObject(this, &AChunkManager::OnChunkGenerated);
 	}
 
-	AActor* Player = GetWorld()->GetFirstPlayerController()->GetPawn();
-	PlayerPos = FVector(
-		FMath::Floor(Player->GetActorLocation().X / ((ChunkSize-1.0f )* 100)),
-		FMath::Floor(Player->GetActorLocation().Y / ((ChunkSize-1.0f )* 100)),
-		0.0f);
-
-
-	for (int y = PlayerPos.Y- RenderDistance; y < PlayerPos.Y+ RenderDistance; y++)
-	{
-		for (int x = PlayerPos.X- RenderDistance; x < PlayerPos.X+ RenderDistance; x++)
-		{
-			RequestChunkGeneration(x * (ChunkSize-1), y * (ChunkSize-1), ChunkSize);
-		}
-	}
-
+	InitialChunkGeneration();
 }
 
 void AChunkManager::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -141,6 +128,45 @@ void AChunkManager::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
+void AChunkManager::InitialChunkGeneration()
+{
+	// Generate center chunk first (at 0,0)
+	RequestChunkGeneration(0, 0, ChunkSize);
+
+	// Generate surrounding chunks
+	for (int y = -RenderDistance; y <= RenderDistance; y++)
+	{
+		for (int x = -RenderDistance; x <= RenderDistance; x++)
+		{
+			if (x == 0 && y == 0)
+			{
+				continue;
+			}
+
+			RequestChunkGeneration(x * (ChunkSize-1), y * (ChunkSize-1), ChunkSize);
+		}
+	}
+
+	// Spawn player in center of initial chunk
+	SpawnPlayer();
+}
+
+void AChunkManager::SpawnPlayer()
+{
+	FVector InitialChunkCenter(
+		(ChunkSize-1) * 100 / 2.0f,  // x center
+		(ChunkSize-1) * 100 / 2.0f,  // y center
+		200.0f                       // z height above terrain
+	);
+	
+	if (APlayerStart* PlayerStart = Cast<APlayerStart>(UGameplayStatics::GetActorOfClass(GetWorld(), APlayerStart::StaticClass())))
+	{
+		PlayerStart->SetActorLocation(InitialChunkCenter);
+		
+		PlayerPos = FVector(0, 0, 0);
+	}
+}
+
 void AChunkManager::OnChunkGenerated(int64 ChunkId)
 {
 	if (bStressTestInProgress)
@@ -172,7 +198,6 @@ void AChunkManager::RequestChunkGeneration(int32 X, int32 Y, int32 Size)
 	
 	if (TerrainGenerator)
 	{
-		// Hard-coded parameters for system testing
 		TerrainGenerator->GenerateChunk(X, Y, Size, Parameters);
 	}
 }

@@ -32,6 +32,12 @@ private:
 	UProceduralMeshGeneratorSubsystem* MeshGenerator;
 
 	UFUNCTION()
+	void InitialChunkGeneration();
+
+	UFUNCTION()
+	void SpawnPlayer();
+	
+	UFUNCTION()
 	void OnChunkGenerated(int64 ChunkId);
 
 	UFUNCTION(BlueprintCallable)
