@@ -5,14 +5,13 @@
 
 DECLARE_MULTICAST_DELEGATE_TwoParams(FChunkDelegate, int64,FChunk);
 
-
 class FChunkThread : public FRunnable
 {
 public:
 
-	FChunkThread(FChunk _chunk,FPerlinParameters _parameters) : Chunk(_chunk), Parameters(_parameters) {
+	FChunkThread(FChunk _chunk,FPerlinParameters _parameters) : Chunk(_chunk), Parameters(_parameters)
+	{
 		Thread = FRunnableThread::Create(this, TEXT("MyThread"), 0, TPri_BelowNormal);
-	
 	};
 
 	virtual bool Init() override;

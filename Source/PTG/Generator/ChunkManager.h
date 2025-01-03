@@ -15,6 +15,9 @@ class PTG_API AChunkManager : public AActor
 public:
 	AChunkManager();
 
+	UFUNCTION(BlueprintCallable)
+	void StressTest(int32 NumChunks);
+
 protected:
 	virtual void BeginPlay() override;
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override; // like a destructor for unsubscribing to delegates
@@ -53,4 +56,9 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	float ChunkOperationInterval = 0.05f;
+
+	// stress test
+	bool bStressTestInProgress = false;
+	double StressTestStartTime = 0.0;
+	int32 PendingChunks = 0;
 };

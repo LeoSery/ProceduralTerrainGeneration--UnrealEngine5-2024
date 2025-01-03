@@ -15,7 +15,20 @@ AChunkManager::AChunkManager()
 	ChunkSize = 32;
 	RenderDistance = 2;
 	PrimaryActorTick.bCanEverTick = true;
+}
 
+void AChunkManager::StressTest(int32 NumChunks)
+{
+	PendingChunks = NumChunks;
+	bStressTestInProgress = true;
+	StressTestStartTime = FPlatformTime::Seconds();
+    
+	UE_LOG(LogTemp, Warning, TEXT("Starting Stress Test (sleep) - Generating %d chunks"), NumChunks);
+    
+	for(int32 i = 0; i < NumChunks; i++)
+	{
+		RequestChunkGeneration(i * 31, 0, 32);
+	}
 }
 
 void AChunkManager::BeginPlay()
@@ -37,9 +50,10 @@ void AChunkManager::BeginPlay()
 		0.0f);
 
 
-	for (int y = PlayerPos.Y- RenderDistance; y < PlayerPos.Y+ RenderDistance; y++) {
-		for (int x = PlayerPos.X- RenderDistance; x < PlayerPos.X+ RenderDistance; x++) {
-
+	for (int y = PlayerPos.Y- RenderDistance; y < PlayerPos.Y+ RenderDistance; y++)
+	{
+		for (int x = PlayerPos.X- RenderDistance; x < PlayerPos.X+ RenderDistance; x++)
+		{
 			RequestChunkGeneration(x * (ChunkSize-1), y * (ChunkSize-1), ChunkSize);
 		}
 	}
@@ -65,13 +79,17 @@ void AChunkManager::Tick(float DeltaTime)
 		FMath::Floor(Player->GetActorLocation().Y / ((ChunkSize - 1.0f) * 100)),
 		0.0f);
 
-	if (!PlayerPos.Equals(pos)) {
+	if (!PlayerPos.Equals(pos))
+	{
 		PlayerPos = pos;
 
 		// Queue new chunks for generation
-		for (int y = PlayerPos.Y - RenderDistance; y < PlayerPos.Y + RenderDistance; y++) {
-			for (int x = PlayerPos.X - RenderDistance; x < PlayerPos.X + RenderDistance; x++) {
-				if (!TerrainGenerator->HasChunk(ChunkData::MakeChunkId(x * (ChunkSize - 1), y * (ChunkSize - 1)))) {
+		for (int y = PlayerPos.Y - RenderDistance; y < PlayerPos.Y + RenderDistance; y++)
+		{
+			for (int x = PlayerPos.X - RenderDistance; x < PlayerPos.X + RenderDistance; x++)
+			{
+				if (!TerrainGenerator->HasChunk(ChunkData::MakeChunkId(x * (ChunkSize - 1), y * (ChunkSize - 1))))
+				{
 					ChunkGenerationQueue.Enqueue(FVector2D(x, y));
 				}
 			}
@@ -81,12 +99,14 @@ void AChunkManager::Tick(float DeltaTime)
 		int32 playerQuadX = FMath::RoundToInt(PlayerPos.X * (ChunkSize - 1));
 		int32 playerQuadY = FMath::RoundToInt(PlayerPos.Y * (ChunkSize - 1));
 
-		for (auto [id, chunk] : TerrainGenerator->ChunkMap) {
+		for (auto [id, chunk] : TerrainGenerator->ChunkMap)
+		{
 			int32 chunkX = FMath::RoundToInt(chunk.Coords.X);
 			int32 chunkY = FMath::RoundToInt(chunk.Coords.Y);
 
 			if (FMath::Abs(chunkX - playerQuadX) > RenderDistance * (ChunkSize - 1) ||
-				FMath::Abs(chunkY - playerQuadY) > RenderDistance * (ChunkSize - 1)) {
+				FMath::Abs(chunkY - playerQuadY) > RenderDistance * (ChunkSize - 1))
+			{
 				ChunkDestructionQueue.Enqueue(id);
 			}
 		}
@@ -94,12 +114,15 @@ void AChunkManager::Tick(float DeltaTime)
 
 	// Process queued operations
 	TimeSinceLastChunkOperation += DeltaTime;
-	if (TimeSinceLastChunkOperation >= ChunkOperationInterval) {
+	
+	if (TimeSinceLastChunkOperation >= ChunkOperationInterval)
+	{
 		TimeSinceLastChunkOperation = 0.0f;
 
 		// Process one chunk generation
 		FVector2D ChunkPos;
-		if (ChunkGenerationQueue.Dequeue(ChunkPos)) {
+		if (ChunkGenerationQueue.Dequeue(ChunkPos))
+		{
 			RequestChunkGeneration(
 				ChunkPos.X * (ChunkSize - 1),
 				ChunkPos.Y * (ChunkSize - 1),
@@ -109,7 +132,8 @@ void AChunkManager::Tick(float DeltaTime)
 
 		// Process one chunk destruction
 		int64 ChunkId;
-		if (ChunkDestructionQueue.Dequeue(ChunkId)) {
+		if (ChunkDestructionQueue.Dequeue(ChunkId))
+		{
 			RequestChunkDestruction(ChunkId);
 		}
 	}
@@ -119,11 +143,23 @@ void AChunkManager::Tick(float DeltaTime)
 
 void AChunkManager::OnChunkGenerated(int64 ChunkId)
 {
-	/* At present, the chunk is displayed as soon as it is generated, but later
-	 * it may be subject to a more advanced logic based on distance from the player
-	 * (a distance from which you decide to generate/destroy the chunk, and another
-	 * distance from which you decide to display/hide the chunk).
-	 */
+	if (bStressTestInProgress)
+	{
+		PendingChunks--;
+        
+		if (PendingChunks <= 0)
+		{
+			double EndTime = FPlatformTime::Seconds();
+			double TotalTime = (EndTime - StressTestStartTime) * 1000.0;
+            
+			UE_LOG(LogTemp, Warning, TEXT("Stress Test Complete:"));
+			UE_LOG(LogTemp, Warning, TEXT("  Total Time: %.2f ms"), TotalTime);
+			UE_LOG(LogTemp, Warning, TEXT("  Average Time per Chunk: %.2f ms"), TotalTime / PendingChunks);
+            
+			bStressTestInProgress = false;
+		}
+	}
+	
 	if (TerrainGenerator)
 	{
 		TerrainGenerator->DisplayChunk(ChunkId);
@@ -133,11 +169,10 @@ void AChunkManager::OnChunkGenerated(int64 ChunkId)
 void AChunkManager::RequestChunkGeneration(int32 X, int32 Y, int32 Size)
 {
 	UE_LOG(LogTemp, Warning, TEXT("Requested Chunk Generation"));
+	
 	if (TerrainGenerator)
 	{
 		// Hard-coded parameters for system testing
-		
-
 		TerrainGenerator->GenerateChunk(X, Y, Size, Parameters);
 	}
 }
