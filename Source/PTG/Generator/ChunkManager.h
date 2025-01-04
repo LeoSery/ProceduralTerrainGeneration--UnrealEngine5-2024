@@ -2,10 +2,11 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "ProceduralMeshComponent.h"
 #include "TerrainGeneratorWorldSubsystem.h"
 #include "ProceduralMeshGeneratorSubsystem.h"
 #include "ChunkManager.generated.h"
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnLoadingProgressUpdate, int32, Current, int32, Total);
 
 UCLASS()
 class PTG_API AChunkManager : public AActor
@@ -15,8 +16,20 @@ class PTG_API AChunkManager : public AActor
 public:
 	AChunkManager();
 
+	UPROPERTY(BlueprintAssignable)
+	FOnLoadingProgressUpdate OnLoadingProgressUpdate;
+	
 	UFUNCTION(BlueprintCallable)
 	void StressTest(int32 NumChunks);
+
+	UPROPERTY(BlueprintReadOnly, Category = "Startup")
+	bool bInitialChunksGenerated;
+
+	UPROPERTY(EditAnywhere, Category = "UI")
+	TSubclassOf<UUserWidget> MainMenuClass;
+
+	UFUNCTION(BlueprintCallable)
+	void InitialChunkGeneration();
 
 protected:
 	virtual void BeginPlay() override;
@@ -30,10 +43,7 @@ private:
 
 	UPROPERTY()
 	UProceduralMeshGeneratorSubsystem* MeshGenerator;
-
-	UFUNCTION()
-	void InitialChunkGeneration();
-
+	
 	UFUNCTION()
 	void SpawnPlayer();
 	
@@ -73,8 +83,7 @@ private:
 	bool bStressTestInProgress = false;
 	double StressTestStartTime = 0.0;
 	int32 PendingChunks = 0;
-
-	bool bInitialChunksGenerated;
+	
 	int32 InitialChunksRemaining;
 
 	UFUNCTION()

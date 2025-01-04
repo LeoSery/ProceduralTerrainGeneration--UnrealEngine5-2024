@@ -1,6 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "PTG/Generator/Wanderer.h"
 #include "Engine/LocalPlayer.h"
 #include "Camera/CameraComponent.h"
@@ -12,7 +9,6 @@
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
 
-// Sets default values
 AWanderer::AWanderer()
 {
 	// Set size for collision capsule
@@ -45,21 +41,16 @@ AWanderer::AWanderer()
 	// are set in the derived blueprint asset named ThirdPersonCharacter (to avoid direct content references in C++)
 }
 
-// Called when the game starts or when spawned
 void AWanderer::BeginPlay()
 {
 	Super::BeginPlay();
-	
 }
 
-// Called every frame
 void AWanderer::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }
 
-// Called to bind functionality to input
 void AWanderer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	// Add Input Mapping Context
@@ -79,7 +70,6 @@ void AWanderer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 		// Looking
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AWanderer::Look);
-
 	}
 }
 
@@ -117,16 +107,14 @@ void AWanderer::Look(const FInputActionValue& Value)
 
 void AWanderer::Sprint(const FInputActionValue& Value)
 {
-
 	bool Sprint = Value.Get<bool>();
 
-	if (Sprint) {
+	if (Sprint)
+	{
 		GetCharacterMovement()->MaxWalkSpeed = 1000;
-
 	}
-	else {
+	else
+	{
 		GetCharacterMovement()->MaxWalkSpeed = 500;
 	}
-
 }
-

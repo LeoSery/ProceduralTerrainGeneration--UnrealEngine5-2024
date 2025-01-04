@@ -1,5 +1,6 @@
 ﻿#include "ChunkManager.h"
 #include "TerrainGeneratorWorldSubsystem.h"
+#include "Blueprint/UserWidget.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/PlayerStart.h"
@@ -55,7 +56,16 @@ void AChunkManager::BeginPlay()
 
 	}
 
-	InitialChunkGeneration();
+	if (UWorld* World = GetWorld())
+	{
+		if (APlayerController* PC = World->GetFirstPlayerController())
+		{
+			if (UUserWidget* MainMenu = CreateWidget<UUserWidget>(PC, MainMenuClass))
+			{
+				MainMenu->AddToViewport();
+			}
+		}
+	}
 }
 
 void AChunkManager::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -70,6 +80,11 @@ void AChunkManager::EndPlay(const EEndPlayReason::Type EndPlayReason)
 
 void AChunkManager::Tick(float DeltaTime)
 {
+	if (!bInitialChunksGenerated)
+	{
+		return;
+	}
+	
 	AActor* Player = GetWorld()->GetFirstPlayerController()->GetPawn();
 
 	FVector pos = FVector(
@@ -141,7 +156,7 @@ void AChunkManager::Tick(float DeltaTime)
 
 void AChunkManager::InitialChunkGeneration()
 {
-	InitialChunksRemaining = (2 * RenderDistance + 1) * (2 * RenderDistance + 1);
+	InitialChunksRemaining = ChunkData::GetInitialChunkCount(RenderDistance);
 
 	if (ACharacter* PlayerCharacter = Cast<ACharacter>(GetWorld()->GetFirstPlayerController()->GetPawn()))
 	{
@@ -192,11 +207,17 @@ void AChunkManager::OnChunkGenerated(int64 ChunkId)
 	if (!bInitialChunksGenerated)
 	{
 		InitialChunksRemaining--;
+
+		OnLoadingProgressUpdate.Broadcast(
+			ChunkData::GetInitialChunkCount(RenderDistance) - InitialChunksRemaining,
+			ChunkData::GetInitialChunkCount(RenderDistance)
+		);
         
 		if (InitialChunksRemaining <= 0)
 		{
 			bInitialChunksGenerated = true;
 			RepositionPlayerToGround();
+			UE_LOG(LogTemp, Warning, TEXT("Initial chunks generation complete!"));
 		}
 	}
 	

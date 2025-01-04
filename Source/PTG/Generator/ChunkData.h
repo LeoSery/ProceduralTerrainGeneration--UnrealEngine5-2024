@@ -62,4 +62,9 @@ namespace ChunkData
 	{
 		return ((int64)X << 32) | ((int64)Y & 0xFFFFFFFF);
 	}
+
+	FORCEINLINE int32 GetInitialChunkCount(int32 RenderDistance)
+	{
+		return (2 * RenderDistance + 1) * (2 * RenderDistance + 1);
+	}
 }
