@@ -15,6 +15,8 @@ void UTerrainGeneratorWorldSubsystem::Deinitialize()
 
 void UTerrainGeneratorWorldSubsystem::GenerateChunk(int32 X, int32 Y, int32 Size, const FPerlinParameters& TerrainParameters, const FPerlinParameters& BiomesParameters)
 {
+	UE_LOG(LogTemp, Warning, TEXT("Starting chunk generation at X: %d, Y: %d"), X, Y);
+	
 	FChunk NewChunk;
 	NewChunk.Size = Size;
 	NewChunk.Coords = FVector(X, Y, 0);
@@ -23,14 +25,22 @@ void UTerrainGeneratorWorldSubsystem::GenerateChunk(int32 X, int32 Y, int32 Size
 	ChunkMap.Add(NewChunk.Id, NewChunk);
 	FChunkThread* Thread = new FChunkThread(NewChunk, TerrainParameters,BiomesParameters);
 	Thread->OnCalcOver.AddUObject(this, &UTerrainGeneratorWorldSubsystem::OnChunkCalcOver);
-	
+
+	UE_LOG(LogTemp, Warning, TEXT("Created chunk thread for ID: %lld"), NewChunk.Id);
 }
 
 void UTerrainGeneratorWorldSubsystem::DisplayChunk(int64 ChunkId)
 {
+	UE_LOG(LogTemp, Warning, TEXT("Attempting to display chunk %lld"), ChunkId);
+	
 	if (const FChunk* ChunkToDisplay = ChunkMap.Find(ChunkId))
 	{
+		UE_LOG(LogTemp, Warning, TEXT("Found chunk %lld in map"), ChunkId);
 		DisplayChunkInternal(*ChunkToDisplay);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("Chunk %lld not found in map"), ChunkId);
 	}
 }
 
@@ -105,9 +115,9 @@ void UTerrainGeneratorWorldSubsystem::DisplayChunkInternal(const FChunk& Chunk)
 	Stats.EndTime = FPlatformTime::Seconds();
 	double GenerationTime = (Stats.EndTime - Stats.StartTime) * 1000;
 	
-	UE_LOG(LogTemp, Warning, TEXT("Chunk %lld Generation Stats:"), Chunk.Id);
-	UE_LOG(LogTemp, Warning, TEXT("  Generation Time: %.2f ms"), GenerationTime);
-	UE_LOG(LogTemp, Warning, TEXT("  Size: %d x %d"), Stats.ChunkSize, Stats.ChunkSize);
-	UE_LOG(LogTemp, Warning, TEXT("  Vertices: %d"), Stats.VertexCount);
-	UE_LOG(LogTemp, Warning, TEXT("  Triangles: %d"), Stats.TriangleCount);
+	// UE_LOG(LogTemp, Warning, TEXT("Chunk %lld Generation Stats:"), Chunk.Id);
+	// UE_LOG(LogTemp, Warning, TEXT("  Generation Time: %.2f ms"), GenerationTime);
+	// UE_LOG(LogTemp, Warning, TEXT("  Size: %d x %d"), Stats.ChunkSize, Stats.ChunkSize);
+	// UE_LOG(LogTemp, Warning, TEXT("  Vertices: %d"), Stats.VertexCount);
+	// UE_LOG(LogTemp, Warning, TEXT("  Triangles: %d"), Stats.TriangleCount);
 }
