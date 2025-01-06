@@ -17,25 +17,25 @@ struct FVertices
 	FVector Normal;
 };
 
-USTRUCT()
+USTRUCT(Blueprintable)
 struct FPerlinParameters
 {
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere)
-	int32 Octaves;
+	int32 Octaves = 0;
 
 	UPROPERTY(EditAnywhere)
-	float Frequency;
+	float Frequency = 0.0f;
 
 	UPROPERTY(EditAnywhere)
-	float Persistence;
+	float Persistence = 0.0f;
 
 	UPROPERTY(EditAnywhere)
-	int32 Seed;
+	int32 Seed = 0;
 
 	UPROPERTY(EditAnywhere)
-	int32 HeightFactor;
+	int32 HeightFactor = 0;
 };
 
 USTRUCT()
