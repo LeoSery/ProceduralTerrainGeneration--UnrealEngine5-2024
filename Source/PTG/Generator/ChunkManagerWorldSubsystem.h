@@ -34,9 +34,6 @@ public:
 	void InitialChunkGeneration(int32 InRenderDistance);
 
 	UFUNCTION(BlueprintCallable)
-	void SetMaterial(UMaterial* Material) { TerrainMaterial = Material; }
-
-	UFUNCTION(BlueprintCallable)
 	int32 GetRenderDistance() const { return RenderDistance; }
 
 	UFUNCTION(BlueprintCallable)
@@ -70,9 +67,6 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	int32 RenderDistance = 10;
-
-	UPROPERTY()
-	UMaterial* TerrainMaterial;
 
 	FVector PlayerPos;
 	TQueue<FVector2D> ChunkGenerationQueue;

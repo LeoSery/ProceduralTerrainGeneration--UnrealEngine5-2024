@@ -69,6 +69,11 @@ void APTGGameMode::GenerateInitialChunks()
 	
 	ChunkManager->SetTerrainParameters(TerrainParameters);
 	ChunkManager->SetBiomesParameters(BiomesParameters);
+
+	if (UTerrainGeneratorWorldSubsystem* TerrainGenerator = GetWorld()->GetSubsystem<UTerrainGeneratorWorldSubsystem>())
+	{
+		TerrainGenerator->SetMaterial(Material);	
+	}
 	
 	ChunkManager->OnLoadingProgressUpdate.AddDynamic(this, &APTGGameMode::HandleGenerationProgress);
 	ChunkManager->InitialChunkGeneration(ChunkManager->GetRenderDistance());

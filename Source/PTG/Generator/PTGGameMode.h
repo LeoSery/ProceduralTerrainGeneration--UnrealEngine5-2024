@@ -31,6 +31,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Terrain Generation")
 	FPerlinParameters BiomesParameters;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Terrain Generation")
+	UMaterial* Material;
 	
 private:
 	UPROPERTY()
