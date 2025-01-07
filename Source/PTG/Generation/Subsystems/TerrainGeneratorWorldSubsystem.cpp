@@ -1,8 +1,8 @@
-﻿#include "ProceduralMeshComponent.h"
+﻿#include "PTG/Generation/Subsystems/TerrainGeneratorWorldSubsystem.h"
+#include "ProceduralMeshComponent.h"
 #include "ProceduralMeshGeneratorSubsystem.h"
 #include "PTG/Generation/Terrain/ChunkData.h"
 #include "PTG/Generation/Terrain/ChunkThread.h"
-#include "PTG/Generation/Subsystems/TerrainGeneratorWorldSubsystem.h"
 
 void UTerrainGeneratorWorldSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
@@ -40,8 +40,6 @@ void UTerrainGeneratorWorldSubsystem::GenerateChunk(int32 X, int32 Y, int32 Size
 	ChunkMap.Add(NewChunk.Id, NewChunk);
 	FChunkThread* Thread = new FChunkThread(NewChunk, TerrainParameters,BiomesParameters);
 	Thread->OnCalcOver.AddUObject(this, &UTerrainGeneratorWorldSubsystem::OnChunkCalcOver);
-
-	UE_LOG(LogTemp, Warning, TEXT("Created chunk thread for ID: %lld"), NewChunk.Id);
 }
 
 void UTerrainGeneratorWorldSubsystem::DisplayChunk(int64 ChunkId)
@@ -50,7 +48,6 @@ void UTerrainGeneratorWorldSubsystem::DisplayChunk(int64 ChunkId)
 	
 	if (const FChunk* ChunkToDisplay = ChunkMap.Find(ChunkId))
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Found chunk %lld in map"), ChunkId);
 		DisplayChunkInternal(*ChunkToDisplay);
 	}
 	else
@@ -75,7 +72,9 @@ bool UTerrainGeneratorWorldSubsystem::DestroyChunk(int64 ChunkId)
 void UTerrainGeneratorWorldSubsystem::OnChunkCalcOver(int64 _id, FChunk _chunk)
 {
 	FChunk* chunk = ChunkMap.Find(_id);
-	if (chunk) {
+	
+	if (chunk)
+	{
 		ChunkMap.Add(_id, _chunk);
 		UE_LOG(LogTemp, Warning, TEXT("Generating Chunk Soone to Display"));
 		OnChunkGenerationComplete.Broadcast(_id);
@@ -95,7 +94,8 @@ void UTerrainGeneratorWorldSubsystem::DisplayChunkInternal(const FChunk& Chunk)
 	{
 		MeshOwner = *ExistingMeshOwner;
 	}
-	else {
+	else
+	{
 		MeshOwner = GetWorld()->SpawnActor<AActor>();
 
 		// Create the procedural mesh component with the actor as its owner
@@ -109,10 +109,12 @@ void UTerrainGeneratorWorldSubsystem::DisplayChunkInternal(const FChunk& Chunk)
 		// Attach the component to the actor's root
 		ProceduralMesh->SetupAttachment(MeshOwner->GetRootComponent());
 		ProceduralMesh->RegisterComponent();
+		
 		if (Material) 
 		{
 			ProceduralMesh->SetMaterial(0, Material);
 		}
+		
 		MeshMap.Emplace(Chunk.Id, MeshOwner);
 	}
 	
@@ -123,7 +125,6 @@ void UTerrainGeneratorWorldSubsystem::DisplayChunkInternal(const FChunk& Chunk)
 			Chunk,
 			0
 		);
-		
 	}
 
 	Stats.VertexCount = Chunk.Size * Chunk.Size;
@@ -131,9 +132,9 @@ void UTerrainGeneratorWorldSubsystem::DisplayChunkInternal(const FChunk& Chunk)
 	Stats.EndTime = FPlatformTime::Seconds();
 	double GenerationTime = (Stats.EndTime - Stats.StartTime) * 1000;
 	
-	// UE_LOG(LogTemp, Warning, TEXT("Chunk %lld Generation Stats:"), Chunk.Id);
-	// UE_LOG(LogTemp, Warning, TEXT("  Generation Time: %.2f ms"), GenerationTime);
-	// UE_LOG(LogTemp, Warning, TEXT("  Size: %d x %d"), Stats.ChunkSize, Stats.ChunkSize);
-	// UE_LOG(LogTemp, Warning, TEXT("  Vertices: %d"), Stats.VertexCount);
-	// UE_LOG(LogTemp, Warning, TEXT("  Triangles: %d"), Stats.TriangleCount);
+	UE_LOG(LogTemp, Warning, TEXT("Chunk %lld Generation Stats:"), Chunk.Id);
+	UE_LOG(LogTemp, Warning, TEXT("  Generation Time: %.2f ms"), GenerationTime);
+	UE_LOG(LogTemp, Warning, TEXT("  Size: %d x %d"), Stats.ChunkSize, Stats.ChunkSize);
+	UE_LOG(LogTemp, Warning, TEXT("  Vertices: %d"), Stats.VertexCount);
+	UE_LOG(LogTemp, Warning, TEXT("  Triangles: %d"), Stats.TriangleCount);
 }

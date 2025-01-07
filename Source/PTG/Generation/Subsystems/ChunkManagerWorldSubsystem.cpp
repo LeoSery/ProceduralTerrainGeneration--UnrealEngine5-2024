@@ -10,7 +10,6 @@ void UChunkManagerWorldSubsystem::Initialize(FSubsystemCollectionBase& Collectio
 		UTerrainGeneratorWorldSubsystem* Generator = World->GetSubsystem<UTerrainGeneratorWorldSubsystem>();
 		if (!Generator)
 		{
-			UE_LOG(LogTemp, Error, TEXT("TerrainGenerator not found, creating new instance..."));
 			Collection.InitializeDependency<UTerrainGeneratorWorldSubsystem>();
 			Generator = World->GetSubsystem<UTerrainGeneratorWorldSubsystem>();
 		}
@@ -160,7 +159,7 @@ void UChunkManagerWorldSubsystem::InitialChunkGeneration(int32 InRenderDistance)
 
 void UChunkManagerWorldSubsystem::RequestChunkGeneration(int32 X, int32 Y, int32 Size)
 {
-	//UE_LOG(LogTemp, Warning, TEXT("Requested Chunk Generation"));
+	UE_LOG(LogTemp, Warning, TEXT("Requested Chunk Generation"));
 
 	if (TerrainGenerator)
 	{

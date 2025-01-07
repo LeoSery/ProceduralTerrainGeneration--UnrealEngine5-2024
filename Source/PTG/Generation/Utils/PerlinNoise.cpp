@@ -32,8 +32,6 @@ void UPerlinNoise::SetSeed(int32 _Seed)
 	seed = _Seed;
 }
 
-
-
 float UPerlinNoise::DotValue(FVector gradient_vector, int x1, int y1, float x, float y)
 {
     x = x - x1;
@@ -49,12 +47,12 @@ float UPerlinNoise::GenerateOctavePerlinValue(float _x, float _y, int32 _octaves
 
     for (int i = 0; i < _octaves; i++)
     {
-        
         total += FMath::Pow(FMath::GetMappedRangeValueClamped(FVector2D(-1,1),FVector2D(0,1),GeneratePerlinValue(_x, _y, i, _frequency, _seed))*1.35,7)* amplitude;
         _frequency = _frequency * 2.0;
         maxValue += amplitude;
         amplitude *= _persistence;
     }
+    
     total;
 
     return total / maxValue;
@@ -89,16 +87,12 @@ float UPerlinNoise::GenerateOctavePerlinSmoothed(float _x, float _y, int32 _octa
     return total / maxValue;
 }
 
-
-
 float UPerlinNoise::GeneratePerlinValue(float _x, float _y, int _octave, float _frequency, int _seed)
 {
-    
     // Scale input coordinates with frequency
     _x = _x * _frequency;
     _y = _y * _frequency;
     
-
     int x0 = FMath::FloorToInt(_x);
     int x1 = x0 + 1;
     int y0 = FMath::FloorToInt(_y);
@@ -107,8 +101,6 @@ float UPerlinNoise::GeneratePerlinValue(float _x, float _y, int _octave, float _
     float sx = _x - x0;
     float sy = _y - y0;
     
-
-
     // Calculate dot products
     float a1 = DotValue(GenerateVector(x0, y0, _octave,_seed), x0, y0, _x, _y);
     float a2 = DotValue(GenerateVector(x1, y0, _octave,_seed), x1, y0, _x, _y);

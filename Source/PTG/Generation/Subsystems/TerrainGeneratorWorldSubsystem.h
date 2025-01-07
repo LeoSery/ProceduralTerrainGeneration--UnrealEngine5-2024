@@ -40,7 +40,6 @@ private:
 	void DisplayChunkInternal(const FChunk& Chunk);
 
 	
-
 	struct FGenerationStats 
 	{
 		double StartTime;

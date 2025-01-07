@@ -1,3 +1,4 @@
+#include "PTG/Core/Player/Wanderer.h"
 #include "InputActionValue.h"
 #include "Engine/LocalPlayer.h"
 #include "Camera/CameraComponent.h"
@@ -6,7 +7,6 @@
 #include "GameFramework/Controller.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
-#include "PTG/Core/Player/Wanderer.h"
 
 AWanderer::AWanderer()
 {

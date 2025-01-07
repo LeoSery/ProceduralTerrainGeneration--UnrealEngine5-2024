@@ -36,8 +36,6 @@ struct FPerlinParameters
 
 	UPROPERTY(EditAnywhere)
 	int32 HeightFactor = 0;
-
-	
 };
 
 USTRUCT()

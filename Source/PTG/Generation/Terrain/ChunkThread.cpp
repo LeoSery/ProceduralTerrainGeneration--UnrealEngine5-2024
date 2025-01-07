@@ -3,13 +3,13 @@
 
 bool FChunkThread::Init()
 {
-	//UE_LOG(LogTemp, Warning, TEXT("Generating Chunk Init"));
+	UE_LOG(LogTemp, Warning, TEXT("Generating Chunk Init"));
 	return true;
 }
 
 uint32 FChunkThread::Run()
 {
-	//UE_LOG(LogTemp, Warning, TEXT("Generating Chunk Run"));
+	UE_LOG(LogTemp, Warning, TEXT("Generating Chunk Run"));
 	int _size = Chunk.Size;
 	int _x = Chunk.Coords.X;
 	int _y = Chunk.Coords.Y;
@@ -58,7 +58,7 @@ uint32 FChunkThread::Run()
 
 void FChunkThread::Exit()
 {
-	//UE_LOG(LogTemp, Warning, TEXT("Generating Chunk Exit"));
+	UE_LOG(LogTemp, Warning, TEXT("Generating Chunk Exit"));
 	
 	AsyncTask(ENamedThreads::GameThread, [this]()
 	{

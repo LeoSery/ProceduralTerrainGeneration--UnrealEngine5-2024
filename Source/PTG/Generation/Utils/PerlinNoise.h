@@ -12,8 +12,6 @@ class PTG_API UPerlinNoise : public UBlueprintFunctionLibrary
 	GENERATED_BODY()
 
 public:
-
-
 	UPerlinNoise();
 	
 	UFUNCTION(BlueprintCallable)
@@ -34,9 +32,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	UTexture2D* GeneratePerlinNoise2D(FVector2D TextureSize, FString AssetPath);
 
-
 private:
-
 	int32 seed;
 	UPROPERTY(EditAnywhere)
 	float frequency = 0.05;
