@@ -3,8 +3,11 @@
 #include "CoreMinimal.h"
 #include "ChunkData.generated.h"
 
+//////// DELEGATES ////////
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnChunkGenerationComplete, int64);
 
+//////// STRUCTS ////////
+/// Vertices data
 USTRUCT()
 struct FVertices
 {
@@ -17,6 +20,7 @@ struct FVertices
 	FVector Normal;
 };
 
+/// Perlin noise parameters
 USTRUCT(Blueprintable)
 struct FPerlinParameters
 {
@@ -38,6 +42,7 @@ struct FPerlinParameters
 	int32 HeightFactor = 0;
 };
 
+/// Chunk structure
 USTRUCT()
 struct FChunk
 {
@@ -59,8 +64,11 @@ struct FChunk
 	int64 Id;
 };
 
+//////// NAMESPACE ////////
 namespace ChunkData
 {
+	//////// METHODS ////////
+	/// Chunks
 	FORCEINLINE int64 GetChunkIdFromCoordinates(int32 X, int32 Y)
 	{
 		return ((int64)X << 32) | ((int64)Y & 0xFFFFFFFF);
