@@ -36,6 +36,8 @@ struct FPerlinParameters
 
 	UPROPERTY(EditAnywhere)
 	int32 HeightFactor = 0;
+
+	
 };
 
 USTRUCT()
@@ -48,6 +50,9 @@ struct FChunk
 
 	UPROPERTY()
 	int32 Size;
+
+	UPROPERTY(EditAnywhere)
+	int32 SubDivision = 1;
 
 	UPROPERTY()
 	FVector Coords;

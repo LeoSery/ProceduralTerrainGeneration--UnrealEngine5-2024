@@ -13,6 +13,8 @@ uint32 FChunkThread::Run()
 	int _size = Chunk.Size;
 	int _x = Chunk.Coords.X;
 	int _y = Chunk.Coords.Y;
+	float min = 0.0f;
+	float max = 0.0f;
 	const int BatchSize = 100;
 	int processedVertices = 0;
 	const int32 totalVertices = _size * _size;
@@ -24,12 +26,16 @@ uint32 FChunkThread::Run()
 	{
 		for (int x = _x,x_scaled = _x*100; x < _x + _size; x++,x_scaled+=100)
 		{
+			//float Z = UPerlinNoise::GenerateOctavePerlinValue(x, y, Parameters.Octaves, Parameters.Persistence, Parameters.Frequency, Parameters.Seed) * Parameters.HeightFactor;
+			float Z =  100004.0 * UPerlinNoise::GenerateOctavePerlinSmoothed(x, y, Parameters.Octaves, Parameters.Persistence, Parameters.Frequency, Parameters.Seed, 3.0f, 0.9f, FVector2D(1.0f / 64.0f));
+
 			FVertices vertex;
-			vertex.Coords = FVector(x_scaled, y_scaled, (FMath::GetMappedRangeValueClamped(FVector2D(-1, 1), FVector2D(0, 1), UPerlinNoise::GenerateOctavePerlinValue(x, y, Parameters.Octaves, Parameters.Persistence, Parameters.Frequency, Parameters.Seed)))
-				* (Parameters.HeightFactor
-					* FMath::GetMappedRangeValueClamped(FVector2D(-1,1),FVector2D(0,2), UPerlinNoise::GenerateOctavePerlinValue(x, y, BiomeParameters.Octaves, BiomeParameters.Persistence, BiomeParameters.Frequency, BiomeParameters.Seed))
-					* BiomeParameters.HeightFactor));
+			vertex.Coords = FVector(x_scaled, y_scaled, Z);
+
+			if (vertex.Coords.Z > max) { max = vertex.Coords.Z; }
+			else if (vertex.Coords.Z < min) { min = vertex.Coords.Z; }
 			vertex.Normal = FVector(0.0f, 0.0f, 1.0f);
+
 			TempVertices.Add(vertex);
 			processedVertices++;
 			
@@ -45,6 +51,8 @@ uint32 FChunkThread::Run()
 		Chunk.VertexArray.Append(TempVertices);
 	}
 	
+	UE_LOG(LogTemp, Error, TEXT("min : %f"),min);
+	UE_LOG(LogTemp, Error, TEXT("max : %f"),max);
 	return 1;
 }
 
@@ -56,6 +64,10 @@ void FChunkThread::Exit()
 	{
 		bisOver = true;
 		OnCalcOver.Broadcast(Chunk.Id, Chunk);
+
+		delete Thread;
+		Thread = nullptr;
+		delete this;
 	});
 }
 

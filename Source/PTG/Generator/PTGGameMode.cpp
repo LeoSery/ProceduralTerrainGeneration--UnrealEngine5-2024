@@ -23,6 +23,8 @@ APTGGameMode::APTGGameMode()
 	BiomesParameters.Persistence = 0.5f;
 	BiomesParameters.Seed = 69;
 	BiomesParameters.HeightFactor = 0;
+
+	RenderDistance = 1;
 }
 
 void APTGGameMode::BeginPlay()
@@ -69,6 +71,7 @@ void APTGGameMode::GenerateInitialChunks()
 	
 	ChunkManager->SetTerrainParameters(TerrainParameters);
 	ChunkManager->SetBiomesParameters(BiomesParameters);
+	ChunkManager->SetRenderDistance(RenderDistance);
 
 	if (UTerrainGeneratorWorldSubsystem* TerrainGenerator = GetWorld()->GetSubsystem<UTerrainGeneratorWorldSubsystem>())
 	{

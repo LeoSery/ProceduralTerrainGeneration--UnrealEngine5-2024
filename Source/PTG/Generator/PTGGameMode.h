@@ -33,6 +33,9 @@ protected:
 	FPerlinParameters BiomesParameters;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Terrain Generation")
+	int32 RenderDistance;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Terrain Generation")
 	UMaterial* Material;
 	
 private:

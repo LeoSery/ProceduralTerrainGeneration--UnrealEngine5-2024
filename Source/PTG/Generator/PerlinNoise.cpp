@@ -49,12 +49,41 @@ float UPerlinNoise::GenerateOctavePerlinValue(float _x, float _y, int32 _octaves
     for (int i = 0; i < _octaves; i++)
     {
         
-        total += GeneratePerlinValue(_x, _y, i, _frequency,_seed) * amplitude;
+        total += FMath::Pow(FMath::GetMappedRangeValueClamped(FVector2D(-1,1),FVector2D(0,1),GeneratePerlinValue(_x, _y, i, _frequency, _seed))*1.35,7)* amplitude;
         _frequency = _frequency * 2.0;
         maxValue += amplitude;
         amplitude *= _persistence;
     }
-    total *= 3.f;
+    total;
+
+    return total / maxValue;
+}
+
+float UPerlinNoise::GenerateOctavePerlinSmoothed(float _x, float _y, int32 _octaves, float _persistence, float _frequency, int _seed, float _gradientPower, float _gradientSmoothing,FVector2D eps)
+{
+    float total = 0.0;
+    float amplitude = 1.0;
+    float maxValue = 0.0;
+
+    FVector2D gradientSum(0.0f);
+
+    for (int i = 0; i < _octaves; i++)
+    {
+        float p00 = FMath::GetMappedRangeValueClamped(FVector2D(-1, 1), FVector2D(0, 1), GeneratePerlinValue(_x, _y, i, _frequency, _seed));
+        float p10 = FMath::GetMappedRangeValueClamped(FVector2D(-1, 1), FVector2D(0, 1), GeneratePerlinValue(_x + eps.X, _y, i, _frequency, _seed));
+        float p01 = FMath::GetMappedRangeValueClamped(FVector2D(-1, 1), FVector2D(0, 1), GeneratePerlinValue(_x, _y + eps.Y, i, _frequency, _seed));
+
+        FVector2D gradient = FVector2D(p10 - p00, p01 - p00) / eps;
+        gradientSum += gradient;
+        float gradientMagnitude = gradientSum.Length();
+        float layerInfluence = (1.0f / (1.0f + _gradientPower * gradientMagnitude));
+
+
+        total += p00 * amplitude * layerInfluence;
+        _frequency = _frequency * 2.0f;
+        maxValue += amplitude;
+        amplitude *= _persistence * FMath::Lerp(1.0f, 1.0f - gradientMagnitude, _gradientSmoothing);
+    }
 
     return total / maxValue;
 }

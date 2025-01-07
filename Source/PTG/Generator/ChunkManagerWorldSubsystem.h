@@ -44,6 +44,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Terrain Generation") 
 	void SetBiomesParameters(const FPerlinParameters& Parameters) { BiomesParameters = Parameters; }
+
+	UFUNCTION(BlueprintCallable,Category = "Terrain Generation")
+	void SetRenderDistance(int32 _RenderDistance) { RenderDistance = _RenderDistance; }
 	
 private:
 	void RequestChunkGeneration(int32 X, int32 Y, int32 Size);

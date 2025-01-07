@@ -27,6 +27,10 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	static float GenerateOctavePerlinValue(float _x, float _y, int32 _octaves, float _persistence, float _frequency,int _seed);
+
+	UFUNCTION(BlueprintCallable)
+	static float GenerateOctavePerlinSmoothed(float _x, float _y, int32 _octaves, float _persistence, float _frequency, int _seed,float _gradientPower, float _gradientSmoothing, FVector2D eps);
+
 	UFUNCTION(BlueprintCallable)
 	UTexture2D* GeneratePerlinNoise2D(FVector2D TextureSize, FString AssetPath);
 
