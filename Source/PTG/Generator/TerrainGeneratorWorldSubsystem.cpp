@@ -10,6 +10,20 @@ void UTerrainGeneratorWorldSubsystem::Initialize(FSubsystemCollectionBase& Colle
 
 void UTerrainGeneratorWorldSubsystem::Deinitialize()
 {
+	for (auto& MeshPair : MeshMap)
+	{
+		if (AActor* Mesh = MeshPair.Value)
+		{
+			if (UProceduralMeshComponent* ProceduralMesh = Mesh->FindComponentByClass<UProceduralMeshComponent>())
+			{
+				ProceduralMesh->ClearMeshSection(0);
+			}
+			Mesh->Destroy();
+		}
+	}
+	MeshMap.Empty();
+	ChunkMap.Empty();
+	
 	Super::Deinitialize();
 }
 
@@ -48,8 +62,9 @@ bool UTerrainGeneratorWorldSubsystem::DestroyChunk(int64 ChunkId)
 {
 	if (MeshMap.Find(ChunkId) && ChunkMap.Find(ChunkId))
 	{
-		// TODO: Add logic to clean chunk procedural mesh sections
 		AActor* Mesh = MeshMap.FindAndRemoveChecked(ChunkId);
+		UProceduralMeshComponent* ProceduralMesh = Mesh->FindComponentByClass<UProceduralMeshComponent>();
+		ProceduralMesh->ClearMeshSection(0);
 		Mesh->Destroy();
 		return ChunkMap.Remove(ChunkId) > 0;
 	}

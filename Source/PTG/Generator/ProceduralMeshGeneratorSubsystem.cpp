@@ -26,7 +26,7 @@ void UProceduralMeshGeneratorSubsystem::CreateChunkMesh(UProceduralMeshComponent
 	Triangles.Reserve(NumTriangles);
 	Normals.Reserve(NumVertices);
 	UVs.Reserve(NumVertices);
-
+	
 	for (int32 y = 0; y < Chunk.Size; y++)
 	{
 		for (int32 x = 0; x < Chunk.Size; x++)

@@ -54,8 +54,8 @@ void FChunkThread::Exit()
 	
 	AsyncTask(ENamedThreads::GameThread, [this]()
 	{
-	bisOver = true;
-	OnCalcOver.Broadcast(Chunk.Id, Chunk);
+		bisOver = true;
+		OnCalcOver.Broadcast(Chunk.Id, Chunk);
 	});
 }
 
