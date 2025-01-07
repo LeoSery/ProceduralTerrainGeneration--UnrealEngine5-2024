@@ -1,5 +1,5 @@
-﻿#include "ChunkManagerWorldSubsystem.h"
-#include "TerrainGeneratorWorldSubsystem.h"
+﻿#include "PTG/Generation/Subsystems/ChunkManagerWorldSubsystem.h"
+#include "PTG/Generation/Subsystems/TerrainGeneratorWorldSubsystem.h"
 
 void UChunkManagerWorldSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {

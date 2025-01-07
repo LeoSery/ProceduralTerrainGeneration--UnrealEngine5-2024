@@ -1,5 +1,6 @@
 
-#include "PerlinNoise.h"
+#include "PTG/Generation/Utils/PerlinNoise.h"
+
 // Core includes
 #include "CoreMinimal.h"
 #include "UObject/Package.h"

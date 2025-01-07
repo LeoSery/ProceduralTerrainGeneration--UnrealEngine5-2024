@@ -1,6 +1,5 @@
-﻿#include "ProceduralMeshGeneratorSubsystem.h"
-
-#include "ProceduralMeshComponent.h"
+﻿#include "ProceduralMeshComponent.h"
+#include "PTG/Generation/Subsystems/ProceduralMeshGeneratorSubsystem.h"
 
 void UProceduralMeshGeneratorSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {

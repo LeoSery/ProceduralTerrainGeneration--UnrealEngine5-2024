@@ -1,5 +1,5 @@
-#include "PTG/Generator/ChunkThread.h"
-#include "PTG/Generator/PerlinNoise.h"
+#include "PTG/Generation/Terrain/ChunkThread.h"
+#include "PTG/Generation/Utils/PerlinNoise.h"
 
 bool FChunkThread::Init()
 {

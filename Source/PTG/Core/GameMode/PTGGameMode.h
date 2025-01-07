@@ -2,7 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
-#include "ChunkManagerWorldSubsystem.h"
+#include "PTG/Generation/Subsystems/ChunkManagerWorldSubsystem.h"
 #include "PTGGameMode.generated.h"
 
 class UUserWidget;

@@ -1,10 +1,9 @@
 ﻿#pragma once
 
 #include "CoreMinimal.h"
-#include "Subsystems/WorldSubsystem.h"
-#include "ChunkData.h"
-#include "ProceduralMeshComponent.h"
 #include "Materials/Material.h"
+#include "Subsystems/WorldSubsystem.h"
+#include "PTG/Generation/Terrain/ChunkData.h"
 #include "TerrainGeneratorWorldSubsystem.generated.h"
 
 struct FPerlinParameters;

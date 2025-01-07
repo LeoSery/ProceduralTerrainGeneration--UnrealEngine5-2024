@@ -1,10 +1,10 @@
 ﻿#include "PTGGameMode.h"
-#include "ChunkManagerWorldSubsystem.h"
 #include "Blueprint/UserWidget.h"
 #include "GameFramework/Character.h"
-#include "GameFramework/CharacterMovementComponent.h"
-#include "TerrainGeneratorWorldSubsystem.h"
 #include "GameFramework/PlayerStart.h"
+#include "GameFramework/CharacterMovementComponent.h"
+#include "PTG/Generation/Subsystems/ChunkManagerWorldSubsystem.h"
+#include "PTG/Generation/Subsystems/TerrainGeneratorWorldSubsystem.h"
 
 APTGGameMode::APTGGameMode()
 {
@@ -140,7 +140,7 @@ void APTGGameMode::RepositionPlayerToGround()
 		if (ACharacter* PlayerCharacter = Cast<ACharacter>(GetWorld()->GetFirstPlayerController()->GetPawn()))
 		{
 			FVector CurrentLocation = PlayerCharacter->GetActorLocation();
-			FVector NewLocation(CurrentLocation.X, CurrentLocation.Y, TerrainHeight + 100.0f);
+			FVector NewLocation(CurrentLocation.X, CurrentLocation.Y, TerrainHeight + 400.0f);
 
 			UE_LOG(LogTemp, Warning, TEXT("Repositioning player to X:%f Y:%f Z:%f"), NewLocation.X, NewLocation.Y, NewLocation.Z);
 			PlayerCharacter->SetActorLocation(NewLocation);

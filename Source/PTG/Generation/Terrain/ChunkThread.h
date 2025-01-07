@@ -1,7 +1,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "ChunkData.h"
+#include "PTG/Generation/Terrain/ChunkData.h"
 
 DECLARE_MULTICAST_DELEGATE_TwoParams(FChunkDelegate, int64,FChunk);
 

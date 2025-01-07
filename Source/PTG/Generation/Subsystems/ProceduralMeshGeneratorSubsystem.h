@@ -2,7 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "Subsystems/GameInstanceSubsystem.h"
-#include "ChunkData.h"
+#include "PTG/Generation/Terrain/ChunkData.h"
 #include "ProceduralMeshGeneratorSubsystem.generated.h"
 
 UCLASS()

@@ -1,10 +1,10 @@
 ﻿#pragma once
 
 #include "CoreMinimal.h"
-#include "Subsystems/WorldSubsystem.h"
-#include "ChunkData.h"
-#include "ProceduralMeshGeneratorSubsystem.h"
 #include "Tickable.h"
+#include "Subsystems/WorldSubsystem.h"
+#include "PTG/Generation/Terrain/ChunkData.h"
+#include "PTG/Generation/Subsystems/ProceduralMeshGeneratorSubsystem.h"
 #include "ChunkManagerWorldSubsystem.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnLoadingProgressUpdate, int32, Current, int32, Total);

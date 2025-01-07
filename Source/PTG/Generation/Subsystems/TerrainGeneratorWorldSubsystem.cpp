@@ -1,7 +1,8 @@
-﻿#include "TerrainGeneratorWorldSubsystem.h"
-#include "ChunkData.h"
-#include "ChunkThread.h"
+﻿#include "ProceduralMeshComponent.h"
 #include "ProceduralMeshGeneratorSubsystem.h"
+#include "PTG/Generation/Terrain/ChunkData.h"
+#include "PTG/Generation/Terrain/ChunkThread.h"
+#include "PTG/Generation/Subsystems/TerrainGeneratorWorldSubsystem.h"
 
 void UTerrainGeneratorWorldSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
