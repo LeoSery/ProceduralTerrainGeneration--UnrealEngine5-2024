@@ -185,6 +185,7 @@ FVector UPerlinNoise::GenerateVector(int _x, int _y, int _octave, int _seed)
     return FVector(x, y, z);
 }
 
+#if WITH_EDITOR
 /**
  * @brief Creates a 2D texture from Perlin noise
  * @param TextureSize Dimensions of output texture
@@ -258,3 +259,4 @@ UTexture2D* UPerlinNoise::GeneratePerlinNoise2D(FVector2D TextureSize, FString A
 
     return NoiseTexture;
 }
+#endif

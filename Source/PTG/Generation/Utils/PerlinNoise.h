@@ -29,9 +29,11 @@ public:
 	static float GenerateOctavePerlinSmoothed(float _x, float _y, int32 _octaves, float _persistence, float _frequency, int _seed,float _gradientPower, float _gradientSmoothing, FVector2D eps);
 	static FVector GenerateVector(int _x, int _y, int _octave,int _seed);
 	
+#if WITH_EDITOR
 	/// Texture generation
 	UFUNCTION(BlueprintCallable)
 	UTexture2D* GeneratePerlinNoise2D(FVector2D TextureSize, FString AssetPath);
+#endif
 
 private:
 	//////// FIELDS ////////
