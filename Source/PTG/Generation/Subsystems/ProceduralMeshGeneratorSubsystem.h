@@ -33,9 +33,17 @@ public:
 	void CreateChunkMesh(UProceduralMeshComponent* ProceduralMesh, const FChunk& Chunk, int32 SectionIndex = 0);
 
 	/// Helpers
+	/**
+	 * @brief Utility function to calculate indices for a grid square
+	 * @param x X coordinate in the grid
+	 * @param y Y coordinate in the grid
+	 * @param gridSize Size of the complete grid
+	 * @return FSquareIndices Structure containing vertex indices for the square
+	 */
 	FORCEINLINE FSquareIndices GetSquareIndices(int32 x, int32 y, int32 gridSize)
 	{
-		return {
+		return
+		{
 			x + y * gridSize,
 			(x + 1) + y * gridSize,
 			x + (y + 1) * gridSize,

@@ -1,12 +1,24 @@
 #include "PTG/Generation/Terrain/ChunkThread.h"
 #include "PTG/Generation/Utils/PerlinNoise.h"
 
+/**
+ * @file ChunkThread.cpp
+ * @brief Implementation of asynchronous chunk generation thread
+ * @details Handles terrain calculation in a separate thread to avoid blocking the game thread
+ */
+
 bool FChunkThread::Init()
 {
 	UE_LOG(LogTemp, Warning, TEXT("Generating Chunk Init"));
 	return true;
 }
 
+/**
+ * @brief Main thread execution method for chunk generation
+ * @return Thread completion status (1 for success)
+ * @details Generates terrain vertices using Perlin noise in batches
+ *          with sleep intervals to prevent thread hogging
+ */
 uint32 FChunkThread::Run()
 {
 	UE_LOG(LogTemp, Warning, TEXT("Generating Chunk Run"));
@@ -26,7 +38,7 @@ uint32 FChunkThread::Run()
 	{
 		for (int x = _x,x_scaled = _x*100; x < _x + _size; x++,x_scaled+=100)
 		{
-			//float Z = UPerlinNoise::GenerateOctavePerlinValue(x, y, Parameters.Octaves, Parameters.Persistence, Parameters.Frequency, Parameters.Seed) * Parameters.HeightFactor;
+			//float Z = UPerlinNoise::GenerateOctavePerlinValue(x, y, Parameters.Octaves, Parameters.Persistence, Parameters.Frequency, Parameters.Seed) * Parameters.HeightFactor; //Old noise
 			float Z =  100004.0 * UPerlinNoise::GenerateOctavePerlinSmoothed(x, y, Parameters.Octaves, Parameters.Persistence, Parameters.Frequency, Parameters.Seed, 3.0f, 0.9f, FVector2D(1.0f / 64.0f));
 
 			FVertices vertex;
@@ -56,6 +68,10 @@ uint32 FChunkThread::Run()
 	return 1;
 }
 
+/**
+ * @brief Cleanup method called when thread completes
+ * @details Broadcasts completion event and cleans up thread resources
+ */
 void FChunkThread::Exit()
 {
 	UE_LOG(LogTemp, Warning, TEXT("Generating Chunk Exit"));

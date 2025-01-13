@@ -8,6 +8,15 @@
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
+/**
+ * @file Wanderer.cpp
+ * @brief Implementation of the first-person character controller for terrain exploration
+ */
+
+ /**
+  * @brief Constructor configuring character movement and camera setup
+  * @details Initializes collision capsule, camera positioning, and movement parameters
+  */
 AWanderer::AWanderer()
 {
 	// Set size for collision capsule
@@ -50,6 +59,10 @@ void AWanderer::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
+/**
+ * @brief Sets up player input bindings using Enhanced Input system
+ * @param PlayerInputComponent Input component to bind actions to
+ */
 void AWanderer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	// Add Input Mapping Context
@@ -72,6 +85,11 @@ void AWanderer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	}
 }
 
+/**
+ * @brief Handles character movement input
+ * @param Value Input vector containing movement directions
+ * @details Translates 2D input into world-space movement considering camera orientation
+ */
 void AWanderer::Move(const FInputActionValue& Value)
 {
 	// input is a Vector2D
@@ -91,6 +109,11 @@ void AWanderer::Move(const FInputActionValue& Value)
 	}
 }
 
+/**
+ * @brief Handles camera look input
+ * @param Value Input vector containing look directions
+ * @details Updates camera pitch and yaw based on mouse/stick input
+ */
 void AWanderer::Look(const FInputActionValue& Value)
 {
 	// input is a Vector2D
@@ -104,6 +127,11 @@ void AWanderer::Look(const FInputActionValue& Value)
 	}
 }
 
+/**
+ * @brief Toggles character sprint state
+ * @param Value Boolean indicating sprint state
+ * @details Modifies character max walk speed based on sprint state
+ */
 void AWanderer::Sprint(const FInputActionValue& Value)
 {
 	bool Sprint = Value.Get<bool>();

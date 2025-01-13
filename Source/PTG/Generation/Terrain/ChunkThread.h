@@ -12,6 +12,13 @@ class FChunkThread : public FRunnable
 {
 public:
 	//////// CONSTRUCTORS ////////
+	/**
+	 * @brief Constructor for chunk generation thread
+	 * @param _chunk Chunk data to generate
+	 * @param _parameters Terrain generation parameters
+	 * @param _biomeParameters Biome generation parameters
+	 * @details Creates and starts a new thread with below normal priority
+	 */
 	FChunkThread(FChunk _chunk,FPerlinParameters _parameters, FPerlinParameters _biomeParameters) : Chunk(_chunk), Parameters(_parameters), BiomeParameters(_biomeParameters)
 	{
 		Thread = FRunnableThread::Create(this, TEXT("MyThread"), 0, TPri_BelowNormal);

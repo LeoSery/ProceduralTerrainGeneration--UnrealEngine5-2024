@@ -1,4 +1,3 @@
-
 #include "PTG/Generation/Utils/PerlinNoise.h"
 
 // Core includes
@@ -22,16 +21,35 @@
 #define M_PI 3.141592
 #define MIN_SIZE 257
 
+/**
+ * @file PerlinNoise.cpp
+ * @brief Implementation of Perlin noise generation algorithms
+ * @details Provides various noise generation methods for terrain and texture creation
+ */
+
 UPerlinNoise::UPerlinNoise()
 {
     
 }
 
+/**
+ * @brief Sets the random seed for noise generation
+ * @param _Seed New seed value
+ */
 void UPerlinNoise::SetSeed(int32 _Seed)
 {
 	seed = _Seed;
 }
 
+/**
+ * @brief Calculates dot product for gradient noise
+ * @param gradient_vector Gradient direction vector
+ * @param x1 Grid point X coordinate
+ * @param y1 Grid point Y coordinate
+ * @param x Sample X coordinate
+ * @param y Sample Y coordinate
+ * @return Dot product result for gradient noise
+ */
 float UPerlinNoise::DotValue(FVector gradient_vector, int x1, int y1, float x, float y)
 {
     x = x - x1;
@@ -39,6 +57,16 @@ float UPerlinNoise::DotValue(FVector gradient_vector, int x1, int y1, float x, f
     return (x * gradient_vector.X + y * gradient_vector.Y);
 }
 
+/**
+ * @brief Generates multi-octave Perlin noise value
+ * @param _x X coordinate
+ * @param _y Y coordinate
+ * @param _octaves Number of noise octaves
+ * @param _persistence Persistence between octaves
+ * @param _frequency Base frequency of noise
+ * @param _seed Random seed
+ * @return Combined noise value
+ */
 float UPerlinNoise::GenerateOctavePerlinValue(float _x, float _y, int32 _octaves, float _persistence, float _frequency,int _seed)
 {
     float total = 0.0;
@@ -58,6 +86,19 @@ float UPerlinNoise::GenerateOctavePerlinValue(float _x, float _y, int32 _octaves
     return total / maxValue;
 }
 
+/**
+ * @brief Generates smoothed multi-octave Perlin noise with gradient influence
+ * @param _x X coordinate
+ * @param _y Y coordinate
+ * @param _octaves Number of noise octaves
+ * @param _persistence Persistence between octaves
+ * @param _frequency Base frequency of noise
+ * @param _seed Random seed
+ * @param _gradientPower Influence of gradient on noise
+ * @param _gradientSmoothing Smoothing factor for gradient transitions
+ * @param eps Small value for gradient calculation
+ * @return Smoothed noise value
+ */
 float UPerlinNoise::GenerateOctavePerlinSmoothed(float _x, float _y, int32 _octaves, float _persistence, float _frequency, int _seed, float _gradientPower, float _gradientSmoothing,FVector2D eps)
 {
     float total = 0.0;
@@ -87,6 +128,15 @@ float UPerlinNoise::GenerateOctavePerlinSmoothed(float _x, float _y, int32 _octa
     return total / maxValue;
 }
 
+/**
+ * @brief Generates base Perlin noise value
+ * @param _x X coordinate
+ * @param _y Y coordinate
+ * @param _octave Current octave level
+ * @param _frequency Noise frequency
+ * @param _seed Random seed
+ * @return Base noise value
+ */
 float UPerlinNoise::GeneratePerlinValue(float _x, float _y, int _octave, float _frequency, int _seed)
 {
     // Scale input coordinates with frequency
@@ -115,6 +165,14 @@ float UPerlinNoise::GeneratePerlinValue(float _x, float _y, int _octave, float _
     return value;
 }
 
+/**
+ * @brief Generates random gradient vector for noise calculation
+ * @param _x Grid X coordinate
+ * @param _y Grid Y coordinate
+ * @param _octave Octave level
+ * @param _seed Random seed
+ * @return Random unit vector
+ */
 FVector UPerlinNoise::GenerateVector(int _x, int _y, int _octave, int _seed)
 {
     std::mt19937 generator(((_seed * 1518 + _x) * 1794 + _y)*1816 + _octave);
@@ -127,7 +185,12 @@ FVector UPerlinNoise::GenerateVector(int _x, int _y, int _octave, int _seed)
     return FVector(x, y, z);
 }
 
-
+/**
+ * @brief Creates a 2D texture from Perlin noise
+ * @param TextureSize Dimensions of output texture
+ * @param AssetPath Path to save generated texture
+ * @return Generated texture object
+ */
 UTexture2D* UPerlinNoise::GeneratePerlinNoise2D(FVector2D TextureSize, FString AssetPath)
 {
     FString PackagePath = TEXT("/Game/") + AssetPath;

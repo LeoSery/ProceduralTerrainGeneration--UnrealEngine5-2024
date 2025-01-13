@@ -6,6 +6,14 @@
 #include "PTG/Generation/Subsystems/ChunkManagerWorldSubsystem.h"
 #include "PTG/Generation/Subsystems/TerrainGeneratorWorldSubsystem.h"
 
+/**
+ * @file PTGGameMode.cpp
+ * @brief Main game mode handling terrain generation and player management
+ */
+
+ /**
+  * @brief Constructor initializing default terrain and biome parameters
+  */
 APTGGameMode::APTGGameMode()
 {
 	PrimaryActorTick.bCanEverTick = true;
@@ -27,6 +35,9 @@ APTGGameMode::APTGGameMode()
 	RenderDistance = 1;
 }
 
+/**
+ * @brief Initializes subsystems and creates main menu
+ */
 void APTGGameMode::BeginPlay()
 {
 	Super::BeginPlay();
@@ -54,6 +65,10 @@ void APTGGameMode::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
+/**
+ * @brief Starts initial terrain chunk generation
+ * @details Temporarily disables player movement, positions player and triggers chunk generation
+ */
 void APTGGameMode::GenerateInitialChunks()
 {
 	if (!ChunkManager)
@@ -82,6 +97,11 @@ void APTGGameMode::GenerateInitialChunks()
 	ChunkManager->InitialChunkGeneration(ChunkManager->GetRenderDistance());
 }
 
+/**
+ * @brief Handles chunk generation progress updates
+ * @param Current Number of chunks currently generated
+ * @param Total Total number of chunks to generate
+ */
 void APTGGameMode::HandleGenerationProgress(int32 Current, int32 Total)
 {
 	UE_LOG(LogTemp, Warning, TEXT("Generation Progress: %d/%d"), Current, Total);
@@ -93,6 +113,9 @@ void APTGGameMode::HandleGenerationProgress(int32 Current, int32 Total)
 	}
 }
 
+/**
+ * @brief Spawns player at initial chunk center
+ */
 void APTGGameMode::SpawnPlayer()
 {
 	FVector InitialChunkCenter(
@@ -112,6 +135,9 @@ void APTGGameMode::SpawnPlayer()
    );
 }
 
+/**
+ * @brief Repositions player to proper height after terrain generation
+ */
 void APTGGameMode::RepositionPlayerToGround()
 {
 	if (!ChunkManager)
@@ -142,7 +168,6 @@ void APTGGameMode::RepositionPlayerToGround()
 			FVector CurrentLocation = PlayerCharacter->GetActorLocation();
 			FVector NewLocation(CurrentLocation.X, CurrentLocation.Y, TerrainHeight + 400.0f);
 
-			UE_LOG(LogTemp, Warning, TEXT("Repositioning player to X:%f Y:%f Z:%f"), NewLocation.X, NewLocation.Y, NewLocation.Z);
 			PlayerCharacter->SetActorLocation(NewLocation);
 			PlayerCharacter->GetCharacterMovement()->SetMovementMode(MOVE_Walking);
 		}

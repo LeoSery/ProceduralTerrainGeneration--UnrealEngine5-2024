@@ -1,6 +1,12 @@
 ﻿#include "PTG/Generation/Subsystems/ChunkManagerWorldSubsystem.h"
 #include "PTG/Generation/Subsystems/TerrainGeneratorWorldSubsystem.h"
 
+/**
+ * @file ChunkManagerWorldSubsystem.cpp
+ * @brief Implementation of the chunk management system handling terrain chunk lifecycle
+ * @details Manages chunk loading and unloading based on player position
+ */
+
 void UChunkManagerWorldSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
 	Super::Initialize(Collection);
@@ -32,6 +38,9 @@ void UChunkManagerWorldSubsystem::Initialize(FSubsystemCollectionBase& Collectio
 	}
 }
 
+/**
+ * @brief Cleans up subsystem resources
+ */
 void UChunkManagerWorldSubsystem::Deinitialize()
 {
 	if (TerrainGenerator)
@@ -42,6 +51,11 @@ void UChunkManagerWorldSubsystem::Deinitialize()
 	Super::Deinitialize();
 }
 
+/**
+ * @brief Updates chunk loading state based on player position
+ * @param DeltaTime Time elapsed since last tick
+ * @details Manages chunk generation and destruction queues based on render distance
+ */
 void UChunkManagerWorldSubsystem::Tick(float DeltaTime)
 {
 	if (!bInitialChunksGenerated)
@@ -122,6 +136,11 @@ void UChunkManagerWorldSubsystem::Tick(float DeltaTime)
     }
 }
 
+/**
+ * @brief Performs stress test of chunk generation
+ * @param NumChunks Number of chunks to generate for testing
+ * @details Measures performance metrics during bulk chunk generation
+ */
 void UChunkManagerWorldSubsystem::StressTest(int32 NumChunks)
 {
 	PendingChunks = NumChunks;
@@ -136,6 +155,11 @@ void UChunkManagerWorldSubsystem::StressTest(int32 NumChunks)
 	}
 }
 
+/**
+ * @brief Initiates generation of initial chunk grid
+ * @param InRenderDistance Radius of chunks to generate around player
+ * @details Creates initial terrain grid centered on player position
+ */
 void UChunkManagerWorldSubsystem::InitialChunkGeneration(int32 InRenderDistance)
 {
 	UE_LOG(LogTemp, Warning, TEXT("Starting InitialChunkGeneration with RenderDistance: %d"), InRenderDistance);
@@ -157,6 +181,12 @@ void UChunkManagerWorldSubsystem::InitialChunkGeneration(int32 InRenderDistance)
 	}
 }
 
+/**
+ * @brief Requests generation of a new chunk
+ * @param X X-coordinate of chunk origin
+ * @param Y Y-coordinate of chunk origin
+ * @param Size Size of chunk in vertices
+ */
 void UChunkManagerWorldSubsystem::RequestChunkGeneration(int32 X, int32 Y, int32 Size)
 {
 	UE_LOG(LogTemp, Warning, TEXT("Requested Chunk Generation"));
@@ -167,6 +197,10 @@ void UChunkManagerWorldSubsystem::RequestChunkGeneration(int32 X, int32 Y, int32
 	}
 }
 
+/**
+ * @brief Requests destruction of an existing chunk
+ * @param ChunkId Unique identifier of chunk to destroy
+ */
 void UChunkManagerWorldSubsystem::RequestChunkDestruction(int64 ChunkId)
 {
 	if (TerrainGenerator)
@@ -175,6 +209,11 @@ void UChunkManagerWorldSubsystem::RequestChunkDestruction(int64 ChunkId)
 	}
 }
 
+/**
+ * @brief Callback handler for chunk generation completion
+ * @param ChunkId Identifier of completed chunk
+ * @details Updates generation progress and manages chunk display and stress test completion
+ */
 void UChunkManagerWorldSubsystem::OnChunkGenerated(int64 ChunkId)
 {
 	if (!bInitialChunksGenerated)

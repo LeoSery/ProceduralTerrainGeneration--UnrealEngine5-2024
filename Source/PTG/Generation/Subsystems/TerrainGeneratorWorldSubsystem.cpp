@@ -4,11 +4,21 @@
 #include "PTG/Generation/Terrain/ChunkData.h"
 #include "PTG/Generation/Terrain/ChunkThread.h"
 
+/**
+ * @file TerrainGeneratorWorldSubsystem.cpp
+ * @brief Implementation of the core terrain generation and management system
+ * @details Handles terrain chunk generation, mesh creation, and material application
+ */
+
 void UTerrainGeneratorWorldSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
 	Super::Initialize(Collection);
 }
 
+/**
+ * @brief Cleans up terrain resources and meshes
+ * @details Removes all generated meshes and clears chunk data
+ */
 void UTerrainGeneratorWorldSubsystem::Deinitialize()
 {
 	for (auto& MeshPair : MeshMap)
@@ -28,6 +38,14 @@ void UTerrainGeneratorWorldSubsystem::Deinitialize()
 	Super::Deinitialize();
 }
 
+/**
+ * @brief Initiates generation of a new terrain chunk
+ * @param X X-coordinate of chunk origin
+ * @param Y Y-coordinate of chunk origin
+ * @param Size Size of chunk in vertices
+ * @param TerrainParameters Perlin noise parameters for height generation
+ * @param BiomesParameters Perlin noise parameters for biome variation
+ */
 void UTerrainGeneratorWorldSubsystem::GenerateChunk(int32 X, int32 Y, int32 Size, const FPerlinParameters& TerrainParameters, const FPerlinParameters& BiomesParameters)
 {
 	UE_LOG(LogTemp, Warning, TEXT("Starting chunk generation at X: %d, Y: %d"), X, Y);
@@ -42,10 +60,12 @@ void UTerrainGeneratorWorldSubsystem::GenerateChunk(int32 X, int32 Y, int32 Size
 	Thread->OnCalcOver.AddUObject(this, &UTerrainGeneratorWorldSubsystem::OnChunkCalcOver);
 }
 
+/**
+ * @brief Creates visual mesh for a generated chunk
+ * @param ChunkId Unique identifier of chunk to display
+ */
 void UTerrainGeneratorWorldSubsystem::DisplayChunk(int64 ChunkId)
-{
-	UE_LOG(LogTemp, Warning, TEXT("Attempting to display chunk %lld"), ChunkId);
-	
+{	
 	if (const FChunk* ChunkToDisplay = ChunkMap.Find(ChunkId))
 	{
 		DisplayChunkInternal(*ChunkToDisplay);
@@ -56,6 +76,11 @@ void UTerrainGeneratorWorldSubsystem::DisplayChunk(int64 ChunkId)
 	}
 }
 
+/**
+ * @brief Removes a chunk from the world
+ * @param ChunkId Unique identifier of chunk to destroy
+ * @return True if chunk was successfully destroyed
+ */
 bool UTerrainGeneratorWorldSubsystem::DestroyChunk(int64 ChunkId)
 {
 	if (MeshMap.Find(ChunkId) && ChunkMap.Find(ChunkId))
@@ -69,6 +94,11 @@ bool UTerrainGeneratorWorldSubsystem::DestroyChunk(int64 ChunkId)
 	return false;
 }
 
+/**
+ * @brief Callback handler for chunk calculation completion
+ * @param _id Identifier of completed chunk
+ * @param _chunk Data of completed chunk
+ */
 void UTerrainGeneratorWorldSubsystem::OnChunkCalcOver(int64 _id, FChunk _chunk)
 {
 	FChunk* chunk = ChunkMap.Find(_id);
@@ -81,6 +111,11 @@ void UTerrainGeneratorWorldSubsystem::OnChunkCalcOver(int64 _id, FChunk _chunk)
 	}
 }
 
+/**
+ * @brief Internal method to handle chunk mesh creation and display
+ * @param Chunk Data of chunk to display
+ * @details Creates procedural mesh component and applies materials
+ */
 void UTerrainGeneratorWorldSubsystem::DisplayChunkInternal(const FChunk& Chunk)
 {
 	FGenerationStats& Stats = GenerationStats.Add(Chunk.Id);

@@ -1,6 +1,13 @@
 ﻿#include "PTG/Generation/Subsystems/ProceduralMeshGeneratorSubsystem.h"
 #include "ProceduralMeshComponent.h"
 
+/**
+ * @file ProceduralMeshGeneratorSubsystem.cpp
+ * @brief Implementation of the procedural mesh generation system
+ * @details Handles creation and updating of terrain meshes including vertices, triangles, normals, and UVs
+ */
+
+
 void UProceduralMeshGeneratorSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
 	Super::Initialize(Collection);
@@ -10,7 +17,17 @@ void UProceduralMeshGeneratorSubsystem::Deinitialize()
 {
 	Super::Deinitialize();
 }
-
+/**
+ * @brief Creates a mesh section for a terrain chunk
+ * @param ProceduralMesh Target mesh component to apply
+ * @param Chunk Data structure containing terrain information
+ * @param SectionIndex Index of the mesh section to create
+ * @details Generates complete mesh data including:
+ *          - Vertex positions from height data
+ *          - Triangle indices for mesh topology
+ *          - Normal vectors for lighting calculations
+ *          - UV coordinates for texturing
+ */
 void UProceduralMeshGeneratorSubsystem::CreateChunkMesh(UProceduralMeshComponent* ProceduralMesh, const FChunk& Chunk, int32 SectionIndex)
 {
 	TArray<FVector> Vertices;
