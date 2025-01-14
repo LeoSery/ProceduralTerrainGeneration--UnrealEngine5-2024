@@ -1,6 +1,6 @@
 # ProceduralTerrainGeneration--UnrealEngine5-2024
 
-This project is a student project implementing ***Procedural Terrain Generation*** with chunk system, realized in **C++ with Unreal Engine 5** for my Master's 2 degree in game development. It generates an infinite terrain using Perlin noise, with dynamic chunk loading/unloading based on player position, and features a triplanar material system for realistic terrain texturing.
+This project is a student project implementing ***Procedural Terrain Generation*** with chunk system, realized in **C++ with Unreal Engine 5** for our Master's 2 degree in game development. It generates an infinite terrain using Perlin noise, with dynamic chunk loading/unloading based on player position, and features a triplanar material system for realistic terrain texturing.
 
 ![TerrainGeneration](./ReadmeContent/DemoScreenshots/PTG_Screen_1.png)
 
@@ -30,7 +30,7 @@ This project implements an **infinite procedural terrain generation system** usi
 - Left > `Q`
 - Backward > `S`
 - Right > `D`
-- Mouse > Look around
+- Look > ``Mouse`
 
 **Development team:**
 - [Léo Séry](https://github.com/LeoSery)
@@ -64,8 +64,6 @@ The project is built around three main subsystems that handle different aspects 
   - Manages mesh optimization
 
 ### 1. Core Architecture
-
-- The project uses three main subsystems for efficient terrain generation and memory management:
 
 ```cpp
 struct FChunk {
