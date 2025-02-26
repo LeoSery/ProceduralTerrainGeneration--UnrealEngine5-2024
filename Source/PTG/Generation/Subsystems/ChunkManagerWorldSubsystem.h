@@ -76,7 +76,6 @@ private:
 
 	/// Runtime Data
 	FVector PlayerPos;
-	TQueue<FVector2D> ChunkGenerationQueue;
 	TQueue<int64> ChunkDestructionQueue;
 	float TimeSinceLastChunkOperation = 0.0f;
 	float ChunkOperationInterval = 0.01f;
@@ -85,6 +84,9 @@ private:
 	double StressTestStartTime = 0.0;
 	int32 PendingChunks = 0;
 	int32 InitialChunksRemaining;
+
+	TArray<FVector2D> ChunkGenerationQueue;
+	FCriticalSection ChunkQueueLock;
 
 	//////// METHODS ////////
 	/// Chunk management

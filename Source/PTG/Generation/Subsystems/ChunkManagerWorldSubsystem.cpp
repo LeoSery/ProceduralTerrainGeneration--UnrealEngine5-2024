@@ -75,6 +75,7 @@ void UChunkManagerWorldSubsystem::Tick(float DeltaTime)
             if (!PlayerPos.Equals(pos))
             {
                 PlayerPos = pos;
+            	
                 // Queue new chunks generation
                 for (int y = PlayerPos.Y - RenderDistance; y <= PlayerPos.Y + RenderDistance; y++)
                 {
@@ -82,7 +83,8 @@ void UChunkManagerWorldSubsystem::Tick(float DeltaTime)
                     {
                         if (!TerrainGenerator->HasChunk(ChunkData::GetChunkIdFromCoordinates(x * (ChunkSize - 1), y * (ChunkSize - 1))))
                         {
-                            ChunkGenerationQueue.Enqueue(FVector2D(x, y));
+            				FScopeLock Lock(&ChunkQueueLock);
+                            ChunkGenerationQueue.AddUnique(FVector2D(x, y));
                         }
                     }
                 }
@@ -114,25 +116,100 @@ void UChunkManagerWorldSubsystem::Tick(float DeltaTime)
     
     if (TimeSinceLastChunkOperation >= ChunkOperationInterval)
     {
-        TimeSinceLastChunkOperation = 0.0f;
+    	TimeSinceLastChunkOperation = 0.0f;
 
-        // Process one chunk generation
-        FVector2D ChunkPos;
-        if (ChunkGenerationQueue.Dequeue(ChunkPos))
-        {
-            RequestChunkGeneration(
-                ChunkPos.X * (ChunkSize - 1),
-                ChunkPos.Y * (ChunkSize - 1),
-                ChunkSize
-            );
-        }
+    	int32 QueueSize;
+	    {
+    		FScopeLock Lock(&ChunkQueueLock);
+    		QueueSize = ChunkGenerationQueue.Num();
+	    }
 
-        // Process one chunk destruction
-        int64 ChunkId;
-        if (ChunkDestructionQueue.Dequeue(ChunkId))
-        {
-            RequestChunkDestruction(ChunkId);
-        }
+    	int32 ChunksToProcess = FMath::Clamp(QueueSize / 5 + 1, 1, 4);
+    	
+    	ChunksToProcess = FMath::Min(ChunksToProcess, QueueSize);
+
+    	FVector PlayerForward = FVector::ZeroVector;
+    	if (APlayerController* PC = GetWorld()->GetFirstPlayerController())
+    	{
+    		PlayerForward = PC->GetControlRotation().Vector();
+    		PlayerForward.Z = 0;
+    		PlayerForward.Normalize();
+    	}
+
+    	for (int32 i = 0; i < ChunksToProcess; ++i)
+    	{
+    		FVector2D ChunkPos;
+    		bool bFoundChunk = false;
+	        
+		    {
+    			FScopeLock Lock(&ChunkQueueLock);
+    			
+    			if (ChunkGenerationQueue.Num() > 0)
+    			{
+					if (i == 0)
+					{
+    					ChunkGenerationQueue.Sort([this, PlayerForward](const FVector2D& A, const FVector2D& B)
+    					{
+							FVector2D PlayerPos2D(PlayerPos.X, PlayerPos.Y);
+    						
+							FVector DirToA(A.X - PlayerPos.X, A.Y - PlayerPos.Y, 0);
+							FVector DirToB(B.X - PlayerPos.X, B.Y - PlayerPos.Y, 0);
+    						
+							if (!DirToA.IsNearlyZero()) DirToA.Normalize();
+							if (!DirToB.IsNearlyZero()) DirToB.Normalize();
+    						
+							float DotA = FVector::DotProduct(PlayerForward, DirToA);
+							float DotB = FVector::DotProduct(PlayerForward, DirToB);
+    						
+							float ViewScoreA = (DotA > 0.0f) ? DotA : -0.5f;
+							float ViewScoreB = (DotB > 0.0f) ? DotB : -0.5f;
+    						
+							float DistA = FVector2D::DistSquared(A, PlayerPos2D);
+							float DistB = FVector2D::DistSquared(B, PlayerPos2D);
+    						
+							const float ViewWeightFactor = 0.9f;
+    						
+							float ScoreA = DistA * (1.0f - ViewScoreA * ViewWeightFactor);
+							float ScoreB = DistB * (1.0f - ViewScoreB * ViewWeightFactor);
+						    
+							return ScoreA < ScoreB;
+						});
+					}
+    				
+	                ChunkPos = ChunkGenerationQueue[0];
+	                ChunkGenerationQueue.RemoveAt(0);
+	                bFoundChunk = true;
+    			}
+		    }
+    		
+    		if (bFoundChunk)
+    		{
+    			RequestChunkGeneration(
+					ChunkPos.X * (ChunkSize - 1),
+					ChunkPos.Y * (ChunkSize - 1),
+					ChunkSize
+				);
+    		}
+    		else
+    		{
+    			break;
+    		}
+    	}
+
+    	int32 DestructionsToProcess = FMath::Min(2, ChunksToProcess);
+
+    	for (int32 i = 0; i < DestructionsToProcess; ++i)
+    	{
+    		int64 ChunkId;
+    		if (ChunkDestructionQueue.Dequeue(ChunkId))
+    		{
+    			RequestChunkDestruction(ChunkId);
+    		}
+    		else
+    		{
+    			break;
+    		}
+    	}
     }
 }
 
