@@ -79,7 +79,7 @@ private:
 	TQueue<FVector2D> ChunkGenerationQueue;
 	TQueue<int64> ChunkDestructionQueue;
 	float TimeSinceLastChunkOperation = 0.0f;
-	float ChunkOperationInterval = 0.05f;
+	float ChunkOperationInterval = 0.01f;
 	bool bStressTestInProgress = false;
 	bool bInitialChunksGenerated;
 	double StressTestStartTime = 0.0;

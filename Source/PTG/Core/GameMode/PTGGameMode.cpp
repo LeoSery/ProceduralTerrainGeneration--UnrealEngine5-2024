@@ -3,6 +3,7 @@
 #include "GameFramework/Character.h"
 #include "GameFramework/PlayerStart.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "GameFramework/SpectatorPawn.h"
 #include "PTG/Generation/Subsystems/ChunkManagerWorldSubsystem.h"
 #include "PTG/Generation/Subsystems/TerrainGeneratorWorldSubsystem.h"
 
@@ -17,6 +18,8 @@
 APTGGameMode::APTGGameMode()
 {
 	PrimaryActorTick.bCanEverTick = true;
+
+	DefaultPawnClass = ASpectatorPawn::StaticClass();
 
 	// Default terrain parameters
 	TerrainParameters.Frequency = 0.1f;
@@ -76,12 +79,6 @@ void APTGGameMode::GenerateInitialChunks()
 		return;
 	}
 
-	// Disable player movement during generation
-	if (ACharacter* PlayerCharacter = Cast<ACharacter>(GetWorld()->GetFirstPlayerController()->GetPawn()))
-	{
-		PlayerCharacter->GetCharacterMovement()->SetMovementMode(MOVE_Flying);
-	}
-
 	SpawnPlayer();
 	
 	ChunkManager->SetTerrainParameters(TerrainParameters);
@@ -118,21 +115,38 @@ void APTGGameMode::HandleGenerationProgress(int32 Current, int32 Total)
  */
 void APTGGameMode::SpawnPlayer()
 {
-	FVector InitialChunkCenter(
+	float ViewHeight = 50000.0f;
+
+	FVector SpawnLocation(
 		(ChunkManager->GetChunkSize() - 1) * 100 / 2.0f,  
 		(ChunkManager->GetChunkSize() - 1) * 100 / 2.0f,  
-		200.0f                       
+		ViewHeight
 	);
-
-	FActorSpawnParameters SpawnParams;
-	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-
-	GetWorld()->SpawnActor<APlayerStart>(
-	   APlayerStart::StaticClass(),
-	   InitialChunkCenter,
-	   FRotator::ZeroRotator,
-	   SpawnParams
-   );
+	
+	if (APlayerController* PC = GetWorld()->GetFirstPlayerController())
+	{
+		if (!PC->GetPawn())
+		{
+			FActorSpawnParameters SpawnParams;
+			SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+            
+			APawn* SpectatorPawn = GetWorld()->SpawnActor<APawn>(
+				DefaultPawnClass,
+				SpawnLocation,
+				FRotator(0, 0, 0),
+				SpawnParams
+			);
+            
+			if (SpectatorPawn)
+			{
+				PC->Possess(SpectatorPawn);
+			}
+		}
+		else
+		{
+			PC->GetPawn()->SetActorLocation(SpawnLocation);
+		}
+	}
 }
 
 /**
@@ -169,7 +183,6 @@ void APTGGameMode::RepositionPlayerToGround()
 			FVector NewLocation(CurrentLocation.X, CurrentLocation.Y, TerrainHeight + 400.0f);
 
 			PlayerCharacter->SetActorLocation(NewLocation);
-			PlayerCharacter->GetCharacterMovement()->SetMovementMode(MOVE_Walking);
 		}
 		else
 		{
