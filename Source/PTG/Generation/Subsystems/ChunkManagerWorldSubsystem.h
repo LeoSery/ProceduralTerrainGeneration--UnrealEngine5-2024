@@ -51,6 +51,8 @@ public:
 	void SetBiomesParameters(const FPerlinParameters& Parameters) { BiomesParameters = Parameters; }
 	UFUNCTION(BlueprintCallable,Category = "Terrain Generation")
 	void SetRenderDistance(int32 _RenderDistance) { RenderDistance = _RenderDistance; }
+	UFUNCTION(BLUEprintable, Category = "Terrain Generation")
+	void SetChunkGenerationFollowTarget(AActor* Target) { ChunkGenerationFollowTarget = Target; }
 
 	//////// DELEGATES IMPLEMENTATION ////////
 	UPROPERTY(BlueprintAssignable)
@@ -64,6 +66,10 @@ private:
 	UPROPERTY()
 	UProceduralMeshGeneratorSubsystem* MeshGenerator;
 
+	/// Generation
+	UPROPERTY()
+	AActor* ChunkGenerationFollowTarget;
+
 	/// Parameters
 	UPROPERTY(EditAnywhere)
 	FPerlinParameters TerrainParameters;
@@ -76,15 +82,17 @@ private:
 
 	/// Runtime Data
 	FVector PlayerPos;
-	TQueue<FVector2D> ChunkGenerationQueue;
 	TQueue<int64> ChunkDestructionQueue;
 	float TimeSinceLastChunkOperation = 0.0f;
-	float ChunkOperationInterval = 0.05f;
+	float ChunkOperationInterval = 0.01f;
 	bool bStressTestInProgress = false;
 	bool bInitialChunksGenerated;
 	double StressTestStartTime = 0.0;
 	int32 PendingChunks = 0;
 	int32 InitialChunksRemaining;
+
+	TArray<FVector2D> ChunkGenerationQueue;
+	FCriticalSection ChunkQueueLock;
 
 	//////// METHODS ////////
 	/// Chunk management
