@@ -51,6 +51,8 @@ public:
 	void SetBiomesParameters(const FPerlinParameters& Parameters) { BiomesParameters = Parameters; }
 	UFUNCTION(BlueprintCallable,Category = "Terrain Generation")
 	void SetRenderDistance(int32 _RenderDistance) { RenderDistance = _RenderDistance; }
+	UFUNCTION(BLUEprintable, Category = "Terrain Generation")
+	void SetChunkGenerationFollowTarget(AActor* Target) { ChunkGenerationFollowTarget = Target; }
 
 	//////// DELEGATES IMPLEMENTATION ////////
 	UPROPERTY(BlueprintAssignable)
@@ -63,6 +65,10 @@ private:
 	UTerrainGeneratorWorldSubsystem* TerrainGenerator;
 	UPROPERTY()
 	UProceduralMeshGeneratorSubsystem* MeshGenerator;
+
+	/// Generation
+	UPROPERTY()
+	AActor* ChunkGenerationFollowTarget;
 
 	/// Parameters
 	UPROPERTY(EditAnywhere)

@@ -94,6 +94,14 @@ void APTGGameMode::GenerateInitialChunks()
 	ChunkManager->InitialChunkGeneration(ChunkManager->GetRenderDistance());
 }
 
+void APTGGameMode::SetChunkGenerationTarget(AActor* Target) const
+{
+	if (ChunkManager)
+	{
+		ChunkManager->SetChunkGenerationFollowTarget(Target);
+	}
+}
+
 /**
  * @brief Handles chunk generation progress updates
  * @param Current Number of chunks currently generated

@@ -25,8 +25,11 @@ public:
 
 	//////// METHODS ////////
 	/// Init
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category = "Terrain Generation")
 	void GenerateInitialChunks();
+	
+	UFUNCTION(BlueprintCallable, Category = "Terrain Generation")
+	void SetChunkGenerationTarget(AActor* Target) const;
 
 protected:
 	//////// FIELDS ////////

@@ -62,49 +62,55 @@ void UChunkManagerWorldSubsystem::Tick(float DeltaTime)
     {
         return;
     }
-    
-    if (APlayerController* PC = GetWorld()->GetFirstPlayerController())
-    {
-        if (APawn* Pawn = PC->GetPawn())
-        {
-            FVector pos = FVector(
-                FMath::Floor(Pawn->GetActorLocation().X / ((ChunkSize - 1.0f) * 100)),
-                FMath::Floor(Pawn->GetActorLocation().Y / ((ChunkSize - 1.0f) * 100)),
-                0.0f);
 
-            if (!PlayerPos.Equals(pos))
+	const AActor* TargetActor = ChunkGenerationFollowTarget;
+	if (!TargetActor)
+	{
+		if (const APlayerController* PC = GetWorld()->GetFirstPlayerController())
+		{
+			TargetActor = PC->GetPawn();
+		}
+	}
+	
+    if (TargetActor)
+    {
+        FVector pos = FVector(
+            FMath::Floor(TargetActor->GetActorLocation().X / ((ChunkSize - 1.0f) * 100)),
+            FMath::Floor(TargetActor->GetActorLocation().Y / ((ChunkSize - 1.0f) * 100)),
+            0.0f);
+
+        if (!PlayerPos.Equals(pos))
+        {
+            PlayerPos = pos;
+            
+            // Queue new chunks generation
+            for (int y = PlayerPos.Y - RenderDistance; y <= PlayerPos.Y + RenderDistance; y++)
             {
-                PlayerPos = pos;
-            	
-                // Queue new chunks generation
-                for (int y = PlayerPos.Y - RenderDistance; y <= PlayerPos.Y + RenderDistance; y++)
+                for (int x = PlayerPos.X - RenderDistance; x <= PlayerPos.X + RenderDistance; x++)
                 {
-                    for (int x = PlayerPos.X - RenderDistance; x <= PlayerPos.X + RenderDistance; x++)
+                    if (!TerrainGenerator->HasChunk(ChunkData::GetChunkIdFromCoordinates(x * (ChunkSize - 1), y * (ChunkSize - 1))))
                     {
-                        if (!TerrainGenerator->HasChunk(ChunkData::GetChunkIdFromCoordinates(x * (ChunkSize - 1), y * (ChunkSize - 1))))
-                        {
-            				FScopeLock Lock(&ChunkQueueLock);
-                            ChunkGenerationQueue.AddUnique(FVector2D(x, y));
-                        }
+            			FScopeLock Lock(&ChunkQueueLock);
+                        ChunkGenerationQueue.AddUnique(FVector2D(x, y));
                     }
                 }
+            }
 
-                // Queue far chunks for destruction
-                int32 playerQuadX = FMath::RoundToInt(PlayerPos.X * (ChunkSize - 1));
-                int32 playerQuadY = FMath::RoundToInt(PlayerPos.Y * (ChunkSize - 1));
+            // Queue far chunks for destruction
+            int32 playerQuadX = FMath::RoundToInt(PlayerPos.X * (ChunkSize - 1));
+            int32 playerQuadY = FMath::RoundToInt(PlayerPos.Y * (ChunkSize - 1));
 
-                if (TerrainGenerator)
+            if (TerrainGenerator)
+            {
+                for (auto& [id, chunk] : TerrainGenerator->ChunkMap)
                 {
-                    for (auto& [id, chunk] : TerrainGenerator->ChunkMap)
-                    {
-                        int32 chunkX = FMath::RoundToInt(chunk.Coords.X);
-                        int32 chunkY = FMath::RoundToInt(chunk.Coords.Y);
+                    int32 chunkX = FMath::RoundToInt(chunk.Coords.X);
+                    int32 chunkY = FMath::RoundToInt(chunk.Coords.Y);
 
-                        if (FMath::Abs(chunkX - playerQuadX) > RenderDistance * (ChunkSize - 1) ||
-                            FMath::Abs(chunkY - playerQuadY) > RenderDistance * (ChunkSize - 1))
-                        {
-                            ChunkDestructionQueue.Enqueue(id);
-                        }
+                    if (FMath::Abs(chunkX - playerQuadX) > RenderDistance * (ChunkSize - 1) ||
+                        FMath::Abs(chunkY - playerQuadY) > RenderDistance * (ChunkSize - 1))
+                    {
+                        ChunkDestructionQueue.Enqueue(id);
                     }
                 }
             }

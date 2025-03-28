@@ -7,7 +7,7 @@ This project is a student project implementing ***Procedural Terrain Generation*
 ## Summary
 
 - [Project pitch](#project-pitch)
-- [Project pictures](#project-pictures)
+- [Project demo](#project-demo)
 - [Technical Section](#technical-section)
 - [How to play the demo](#how-to-play-the-demo)
 - [Possible improvements](#possible-improvements)
@@ -30,15 +30,21 @@ This project implements an **infinite procedural terrain generation system** usi
 - Left > `Q`
 - Backward > `S`
 - Right > `D`
-- Look > ``Mouse`
+- Look > `Mouse`
 
 **Development team:**
 - [Léo Séry](https://github.com/LeoSery)
 - [Thibaut le perf](https://github.com/pepsithib)
 
-## Project pictures
+## Project demo
 
+### Inifinite chunk generation
 ![PTG_Demo_1](./ReadmeContent/TechnicalDemoGifs/PTG_Demo_1.gif)
+
+### How a chunk is generated
+![PTG_Demo_2](./ReadmeContent/TechnicalDemoGifs/PTG_Demo_2.gif)
+
+### Project pictures
 ![PTG_Screen_2](./ReadmeContent/DemoScreenshots/PTG_Screen_2.png)
 ![PTG_Screen_3](./ReadmeContent/DemoScreenshots/PTG_Screen_3.png)
 
